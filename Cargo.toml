@@ -1,0 +1,20 @@
+[package]
+name = "acp_research"
+version = "0.1.0"
+authors = ["Noah Lewis <nlewi26@lsu.edu>"]
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "acp_research"
+
+[dependencies]
+actix-web = "4.3.1"
+dotenv = "0.15.0"
+envy = "0.4.2"
+mongodb = "2.6.0"
+serde = { version = "1.0.171", features = ["derive"] }
+tokio = "1.29.1"

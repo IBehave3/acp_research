@@ -1,4 +1,6 @@
+use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
+use env_logger::Env;
 use startup::on_startup;
 use startup::API_CONFIG;
 
@@ -7,6 +9,9 @@ mod infra;
 mod startup;
 
 pub async fn start_server() -> std::io::Result<()> {
+    env_logger::try_init_from_env(Env::default().default_filter_or("info"))
+        .expect("failed to init logger");
+
     on_startup().await;
 
     let host = &API_CONFIG.get().unwrap().host;
@@ -15,7 +20,7 @@ pub async fn start_server() -> std::io::Result<()> {
     println!("Info server listening at {host}:{port}");
 
     HttpServer::new(|| {
-        App::new().service(
+        App::new().wrap(Logger::default()).service(
             web::scope("/api")
                 // NOTE: test endpoints
                 .service(controller::test::test_get_handler)

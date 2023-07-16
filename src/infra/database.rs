@@ -25,11 +25,14 @@ pub async fn set_client_connection() {
     let port = &startup::DB_CONFIG.get().unwrap().port;
     let database = &startup::DB_CONFIG.get().unwrap().database;
 
-    let client_options =
-        match ClientOptions::parse(format!("mongodb://{host}:{port}/{database}")).await {
-            Ok(client_options) => client_options,
-            Err(error) => panic!("{:#?}", error),
-        };
+    let db_conn_string = format!("mongodb://{host}:{port}/{database}");
+
+    println!("Info conn string: {db_conn_string}");
+
+    let client_options = match ClientOptions::parse(db_conn_string).await {
+        Ok(client_options) => client_options,
+        Err(error) => panic!("{:#?}", error),
+    };
 
     let client = match Client::with_options(client_options) {
         Ok(client) => client,

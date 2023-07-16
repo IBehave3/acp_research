@@ -31,8 +31,8 @@ pub async fn start_server() -> std::io::Result<()> {
                 .service(controller::notification::notification_get_handler)
                 .service(controller::notification::notification_post_handler)
                 // NOTE: device endpoints
-                .service(controller::device::device_post_handler)
-                .service(controller::device::reset_device_get_handler)
+                .service(controller::datastructure::datastructure_post_handler)
+                .service(controller::datastructure::reset_datastructure_get_handler)
                 .service(
                     web::scope("/auth")
                         // NOTE: auth endpoints

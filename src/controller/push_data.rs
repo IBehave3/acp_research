@@ -15,7 +15,7 @@ pub struct UserPushData {
 }
 
 #[derive(Deserialize, Serialize)]
-struct PushData {
+pub struct PushData {
     _id: ObjectId,
     #[serde(with = "bson::serde_helpers::bson_datetime_as_rfc3339_string")]
     #[serde(rename(serialize = "createdAt", deserialize = "createdAt"))]

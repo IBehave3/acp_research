@@ -28,9 +28,9 @@ impl IdMapping {
 #[derive(Serialize, Deserialize)]
 pub struct DataStructureDeviceMapping {
     #[serde(rename(serialize = "dataStructureId", deserialize = "dataStructureId"))]
-    data_structure_id: String,
+    pub data_structure_id: String,
     #[serde(rename(serialize = "deviceIds", deserialize = "deviceIds"))]
-    device_ids: Option<Vec<String>>,
+    pub device_ids: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize)]

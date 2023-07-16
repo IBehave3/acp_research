@@ -1,6 +1,7 @@
 use crate::infra::database;
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
+use mongodb::options::DeleteOptions;
 use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
 use mongodb::{
     bson::{oid::ObjectId, Document},
@@ -88,6 +89,26 @@ pub trait BaseCollection {
         }
 
         results
+    }
+
+    async fn replace(oid: ObjectId, doc: Self::DocumentType) {
+        let filter = doc! { "_id": oid };
+        Self::replace_options(filter, doc).await;
+    }
+
+    async fn replace_options(filter: Document, doc: Self::DocumentType) {
+        let collection = Self::get_collection();
+        collection.replace_one(filter, doc, None).await.unwrap();
+    }
+
+    async fn delete(oid: ObjectId) {
+        let filter = doc! { "_id": oid };
+        Self::delete_options(filter, None).await;
+    }
+
+    async fn delete_options(filter: Document, options: Option<DeleteOptions>) {
+        let collection = Self::get_collection();
+        collection.delete_many(filter, options).await.unwrap();
     }
 
     async fn add(doc: Self::DocumentType) {

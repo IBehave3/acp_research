@@ -1,5 +1,5 @@
-use crate::controller::manage::ContainerGetQueryExtractor;
 use crate::infra::collection;
+use crate::model::manage::ContainerGetQueryExtractor;
 use actix_web::{get, web::Query, HttpResponse, Responder, Result};
 
 #[get("/container")]

@@ -1,6 +1,6 @@
-use crate::controller::auth::IdMapping;
-use crate::controller::push_data::{PushData, PushDataQueryExtractor, UserPushData};
 use crate::infra::collection::BaseCollection;
+use crate::model::auth::IdMapping;
+use crate::model::push_data::{PushData, PushDataQueryExtractor, UserPushData};
 use actix_web::web::Json;
 use actix_web::web::Query;
 use actix_web::{get, post, HttpResponse, Responder, Result};

@@ -1,6 +1,6 @@
-use crate::controller::auth::{CreateUserPostJsonExtractor, IdMapping, UserIdQueryExtractor};
-use crate::controller::{notification::Notification, push_data::PushData};
 use crate::infra::collection::BaseCollection;
+use crate::model::auth::{CreateUserPostJsonExtractor, IdMapping, UserIdQueryExtractor};
+use crate::model::{notification::Notification, push_data::PushData};
 use actix_web::{delete, get, post, web::Json, web::Query, HttpResponse, Responder, Result};
 use mongodb::bson::doc;
 use mongodb::bson::oid::ObjectId;

@@ -6,6 +6,7 @@ use startup::API_CONFIG;
 
 mod controller;
 mod infra;
+mod model;
 mod presentation;
 mod startup;
 

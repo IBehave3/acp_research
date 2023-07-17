@@ -1,7 +1,7 @@
-use crate::controller::auth::{DataStructureDeviceMapping, IdMapping, UserIdQueryExtractor};
-use crate::controller::datastructure::DataStructureQueryExtractor;
-use crate::controller::push_data::PushData;
 use crate::infra::collection::BaseCollection;
+use crate::model::auth::{DataStructureDeviceMapping, IdMapping, UserIdQueryExtractor};
+use crate::model::datastructure::DataStructureQueryExtractor;
+use crate::model::push_data::PushData;
 use actix_web::{get, post, web::Json, web::Query, HttpResponse, Responder, Result};
 use mongodb::bson::doc;
 

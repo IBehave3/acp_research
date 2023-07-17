@@ -1,3 +1,4 @@
+use crate::controller::{notification::Notification, push_data::PushData};
 use crate::infra::{collection, collection::BaseCollection, database};
 use actix_web::{delete, get, post, web::Json, web::Query, HttpResponse, Responder, Result};
 use mongodb::bson::oid::ObjectId;
@@ -92,6 +93,22 @@ pub async fn login_user_get_handler(query: Query<UserIdQueryExtractor>) -> Resul
 }
 
 #[delete("remove-user")]
-pub async fn remove_user_delete_handler() -> Result<impl Responder> {
+pub async fn remove_user_delete_handler(
+    query: Query<UserIdQueryExtractor>,
+) -> Result<impl Responder> {
+    let id_mapping = IdMapping::get_id_mapping_by_user_id(&query.user_id).await;
+
+    if id_mapping.is_none() {
+        return Ok(HttpResponse::NotFound().finish());
+    }
+
+    let id_mapping = id_mapping.unwrap();
+    let ref_filter = doc! { "idMappingRefId": id_mapping._id };
+
+    // FIXME: delete_options should probably take a ref to filters
+    IdMapping::delete(id_mapping._id).await;
+    Notification::delete_options(ref_filter.clone(), None).await;
+    PushData::delete_options(ref_filter, None).await;
+
     Ok(HttpResponse::Ok().finish())
 }

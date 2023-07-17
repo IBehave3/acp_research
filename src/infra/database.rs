@@ -1,8 +1,8 @@
 use crate::infra::collection;
 use crate::startup;
-use mongodb::options::{CreateCollectionOptions, CreateIndexOptions, DeleteOptions, IndexOptions};
+use mongodb::options::{IndexOptions};
 use mongodb::IndexModel;
-use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
+use mongodb::{bson::doc};
 use mongodb::{options::ClientOptions, Client, Database};
 use std::sync::OnceLock;
 

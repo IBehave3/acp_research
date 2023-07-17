@@ -1,13 +1,13 @@
 use crate::infra::database;
 use async_trait::async_trait;
-use bson::Bson;
+
 use futures::stream::TryStreamExt;
-use mongodb::options::{CreateCollectionOptions, CreateIndexOptions, DeleteOptions, IndexOptions};
+use mongodb::options::{DeleteOptions};
 use mongodb::IndexModel;
 use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
 use mongodb::{
     Collection, Database,
-    {bson, bson::oid::ObjectId, bson::Document},
+    {bson::oid::ObjectId, bson::Document},
 };
 use serde::{de::DeserializeOwned, Serialize};
 

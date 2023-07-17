@@ -1,6 +1,6 @@
 use crate::infra::database;
 use dotenv::dotenv;
-use envy;
+
 use serde::Deserialize;
 use std::sync::OnceLock;
 

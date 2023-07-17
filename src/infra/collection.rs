@@ -29,11 +29,11 @@ pub async fn get_all_collection(
     let mut cursor = collection.find(None, None).await?;
     let mut results: Vec<Document> = Vec::new();
 
-    while cursor.advance().await? == true {
+    while cursor.advance().await? {
         results.push(cursor.deserialize_current()?);
     }
 
-    return Ok(results);
+    Ok(results)
 }
 
 pub async fn get_all_collection_names() -> Result<Vec<String>, Box<dyn std::error::Error>> {
@@ -44,7 +44,7 @@ pub async fn get_all_collection_names() -> Result<Vec<String>, Box<dyn std::erro
         results.push(name);
     }
 
-    return Ok(results);
+    Ok(results)
 }
 
 #[async_trait]

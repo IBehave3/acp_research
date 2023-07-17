@@ -17,10 +17,10 @@ pub async fn init_db() {
 
     let db = &get_db_connection();
 
-    collection::create_collection(&db, collection::ID_MAPPING_COLLECTION_NAME).await;
-    collection::create_collection(&db, collection::PUSH_DATA_COLLECTION_NAME).await;
-    collection::create_collection(&db, collection::NOTIFICATION_COLLECTION_NAME).await;
-    collection::create_collection(&db, collection::TEST_COLLECTION_NAME).await;
+    collection::create_collection(db, collection::ID_MAPPING_COLLECTION_NAME).await;
+    collection::create_collection(db, collection::PUSH_DATA_COLLECTION_NAME).await;
+    collection::create_collection(db, collection::NOTIFICATION_COLLECTION_NAME).await;
+    collection::create_collection(db, collection::TEST_COLLECTION_NAME).await;
 }
 
 pub async fn set_client_connection() {

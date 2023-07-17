@@ -19,7 +19,7 @@ impl IdMapping {
         user_id: &str,
     ) -> Result<Option<Self>, Box<dyn std::error::Error>> {
         let filter = doc! { "userId": user_id };
-        return IdMapping::get_options(Some(filter), None).await;
+        IdMapping::get_options(Some(filter), None).await
     }
 
     pub async fn id_mapping_exists(user_id: &str) -> Result<bool, Box<dyn std::error::Error>> {

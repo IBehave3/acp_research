@@ -1,11 +1,13 @@
 use crate::infra::database;
 use async_trait::async_trait;
+use bson::Bson;
 use futures::stream::TryStreamExt;
-use mongodb::options::DeleteOptions;
+use mongodb::options::{CreateCollectionOptions, CreateIndexOptions, DeleteOptions, IndexOptions};
+use mongodb::IndexModel;
 use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
 use mongodb::{
-    bson::{oid::ObjectId, Document},
     Collection, Database,
+    {bson, bson::oid::ObjectId, bson::Document},
 };
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -14,10 +16,22 @@ pub const PUSH_DATA_COLLECTION_NAME: &str = "push_data";
 pub const NOTIFICATION_COLLECTION_NAME: &str = "notification";
 pub const TEST_COLLECTION_NAME: &str = "test";
 
-pub async fn create_collection(db: &Database, container_name: &str) {
+pub async fn create_collection(db: &Database, container_name: &str, model: Option<IndexModel>) {
     match db.create_collection(container_name, None).await {
         Err(_) => println!("Info container {container_name} already exists"),
-        Ok(_) => println!("Infor contianer {container_name} created"),
+        Ok(_) => {
+            println!("Info contianer {container_name} created");
+            println!("Info creating indexes for {container_name}");
+
+            if model.is_some() {
+                let model = model.unwrap();
+                let collection: Collection<Document> = db.collection(container_name);
+                collection
+                    .create_index(model, None)
+                    .await
+                    .expect("Error failed to create index");
+            }
+        }
     };
 }
 

@@ -1,10 +1,8 @@
-// FIXME: put instructions on creating db in mongodb
-
 # acp_research 
 acp_research is an API built with Rust and MongoDb to store and analyze data.
 
 ## Installation
-Tested is using an LTS Ubuntu OS
+Tested using an Ubuntu LTS 22 
 Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation
 Use the mongodb site to https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu
 
@@ -26,7 +24,6 @@ service mongod status
 ```
 cp default.env .env
 ```
-set correct values in .env
 
 ## Building and Running API
 ```bash

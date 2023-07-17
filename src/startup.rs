@@ -34,7 +34,7 @@ fn init_config() {
 
     let api_config = match envy::prefixed("SERVER_").from_env::<ServerConfig>() {
         Ok(config) => config,
-        Err(error) => panic!("{:#?}", error),
+        Err(error) => panic!("Error: {:#?}", error),
     };
 
     API_CONFIG
@@ -43,7 +43,7 @@ fn init_config() {
 
     let db_config = match envy::prefixed("DB_").from_env::<DbConfig>() {
         Ok(config) => config,
-        Err(error) => panic!("{:#?}", error),
+        Err(error) => panic!("Error: {:#?}", error),
     };
 
     DB_CONFIG

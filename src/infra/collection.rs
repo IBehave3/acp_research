@@ -21,28 +21,30 @@ pub async fn create_collection(db: &Database, container_name: &str) {
     };
 }
 
-pub async fn get_all_collection(collection_name: &str) -> Vec<Document> {
+pub async fn get_all_collection(
+    collection_name: &str,
+) -> Result<Vec<Document>, Box<dyn std::error::Error>> {
     let db = database::get_db_connection();
     let collection: Collection<Document> = db.collection(collection_name);
-    let mut cursor = collection.find(None, None).await.unwrap();
+    let mut cursor = collection.find(None, None).await?;
     let mut results: Vec<Document> = Vec::new();
 
-    while cursor.advance().await.unwrap() == true {
-        results.push(cursor.deserialize_current().unwrap());
+    while cursor.advance().await? == true {
+        results.push(cursor.deserialize_current()?);
     }
 
-    return results;
+    return Ok(results);
 }
 
-pub async fn get_all_collection_names() -> Vec<String> {
+pub async fn get_all_collection_names() -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let db = database::get_db_connection();
     let mut results: Vec<String> = Vec::new();
 
-    for name in db.list_collection_names(None).await.unwrap() {
+    for name in db.list_collection_names(None).await? {
         results.push(name);
     }
 
-    return results;
+    return Ok(results);
 }
 
 #[async_trait]
@@ -51,7 +53,7 @@ pub trait BaseCollection {
 
     fn get_collection() -> Collection<Self::DocumentType>;
 
-    async fn get(oid: ObjectId) -> Option<Self::DocumentType> {
+    async fn get(oid: ObjectId) -> Result<Option<Self::DocumentType>, Box<dyn std::error::Error>> {
         let filter = doc! { "_id": oid };
         return Self::get_options(Some(filter), None).await;
     }
@@ -59,60 +61,75 @@ pub trait BaseCollection {
     async fn get_options(
         filter: Option<Document>,
         options: Option<FindOneOptions>,
-    ) -> Option<Self::DocumentType> {
+    ) -> Result<Option<Self::DocumentType>, Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        return collection.find_one(filter, options).await.unwrap();
+        let result = collection.find_one(filter, options).await?;
+        return Ok(result);
     }
 
-    async fn get_all() -> Vec<Self::DocumentType> {
+    async fn get_all() -> Result<Vec<Self::DocumentType>, Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        let mut cursor = collection.find(None, None).await.unwrap();
+        let mut cursor = collection.find(None, None).await?;
         let mut results: Vec<Self::DocumentType> = Vec::new();
 
-        while let Some(doc) = cursor.try_next().await.unwrap() {
+        while let Some(doc) = cursor.try_next().await? {
             results.push(doc);
         }
 
-        results
+        Ok(results)
     }
 
     async fn get_all_options(
         filter: Option<Document>,
         options: Option<FindOptions>,
-    ) -> Vec<Self::DocumentType> {
+    ) -> Result<Vec<Self::DocumentType>, Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        let mut cursor = collection.find(filter, options).await.unwrap();
+        let mut cursor = collection.find(filter, options).await?;
         let mut results: Vec<Self::DocumentType> = Vec::new();
 
-        while let Some(doc) = cursor.try_next().await.unwrap() {
+        while let Some(doc) = cursor.try_next().await? {
             results.push(doc);
         }
 
-        results
+        Ok(results)
     }
 
-    async fn replace(oid: ObjectId, doc: Self::DocumentType) {
+    async fn replace(
+        oid: ObjectId,
+        doc: Self::DocumentType,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let filter = doc! { "_id": oid };
-        Self::replace_options(filter, doc).await;
+        Self::replace_options(filter, doc).await?;
+        Ok(())
     }
 
-    async fn replace_options(filter: Document, doc: Self::DocumentType) {
+    async fn replace_options(
+        filter: Document,
+        doc: Self::DocumentType,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        collection.replace_one(filter, doc, None).await.unwrap();
+        collection.replace_one(filter, doc, None).await?;
+        Ok(())
     }
 
-    async fn delete(oid: ObjectId) {
+    async fn delete(oid: ObjectId) -> Result<(), Box<dyn std::error::Error>> {
         let filter = doc! { "_id": oid };
-        Self::delete_options(filter, None).await;
+        Self::delete_options(filter, None).await?;
+        Ok(())
     }
 
-    async fn delete_options(filter: Document, options: Option<DeleteOptions>) {
+    async fn delete_options(
+        filter: Document,
+        options: Option<DeleteOptions>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        collection.delete_many(filter, options).await.unwrap();
+        collection.delete_many(filter, options).await?;
+        Ok(())
     }
 
-    async fn add(doc: Self::DocumentType) {
+    async fn add(doc: Self::DocumentType) -> Result<(), Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        collection.insert_one(doc, None).await.unwrap();
+        collection.insert_one(doc, None).await?;
+        Ok(())
     }
 }

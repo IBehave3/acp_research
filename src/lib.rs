@@ -1,6 +1,7 @@
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use env_logger::Env;
+use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
@@ -24,7 +25,7 @@ pub async fn start_server() -> std::io::Result<()> {
     let host = &api_config.host;
     let port = api_config.port;
 
-    println!("Info server listening at {host}:{port}");
+    info!("server listening at {host}:{port}");
 
     HttpServer::new(|| {
         App::new().wrap(Logger::default()).service(

@@ -2,7 +2,8 @@ use crate::infra::database;
 use async_trait::async_trait;
 
 use futures::stream::TryStreamExt;
-use mongodb::options::{DeleteOptions};
+use log::info;
+use mongodb::options::DeleteOptions;
 use mongodb::IndexModel;
 use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
 use mongodb::{
@@ -18,10 +19,10 @@ pub const TEST_COLLECTION_NAME: &str = "test";
 
 pub async fn create_collection(db: &Database, container_name: &str, model: Option<IndexModel>) {
     match db.create_collection(container_name, None).await {
-        Err(_) => println!("Info container {container_name} already exists"),
+        Err(_) => info!("container {container_name} already exists"),
         Ok(_) => {
-            println!("Info contianer {container_name} created");
-            println!("Info creating indexes for {container_name}");
+            info!("contianer {container_name} created");
+            info!("creating indexes for {container_name}");
 
             if model.is_some() {
                 let model = model.unwrap();

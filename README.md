@@ -35,12 +35,9 @@ cargo run --release
 ```
 sudo apt update
 sudo apt install nginx
-sudo ufw app list
-sudo ufw allow 'Nginx HTTP'
-sudo ufw allow 'Nginx HTTPS'
-sudo ufw enable
-sudo cp nginx/nginx.confg /etc/nginx/nginx.conf
+sudo cp nginx/nginx.conf /etc/nginx/nginx.conf
 sudo cp -r cert/ /etc/nginx/
+sudo systemctl restart nginx
 ```
 
 ## Connection to Test Server
@@ -50,13 +47,10 @@ ssh -i "AcpResearch.pem" ubuntu@ec2-18-207-248-247.compute-1.amazonaws.com
 
 ## Setup on Test Server
 ```
-sudo apt install git
-sudo apt install gh
-sudo apt install gcc
+sudo apt install git gh gcc
 gh auth login
 gh repo clone https://github.com/IBehave3/acp_research
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-sudo apt-get install gnupg curl
 curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
    sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
    --dearmor
@@ -68,4 +62,5 @@ sudo systemctl status mongod
 mongosh
 use acp_research_dev_db
 cargo run --release
+sudo ./target/release/acp_research >> output.log 2>&1
 ```

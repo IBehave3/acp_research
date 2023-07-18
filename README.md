@@ -27,8 +27,8 @@ cp default.env .env
 
 ## Building and Running API
 ```bash
-cargo build
-cargo run
+cargo build --release
+cargo run --release
 ```
 
 ## Setting up Nginx
@@ -39,6 +39,8 @@ sudo ufw app list
 sudo ufw allow 'Nginx HTTP'
 sudo ufw allow 'Nginx HTTPS'
 sudo ufw enable
+sudo cp nginx/nginx.confg /etc/nginx/nginx.conf
+sudo cp -r cert/ /etc/nginx/
 ```
 
 ## Connection to Test Server
@@ -63,5 +65,7 @@ sudo apt-get update
 sudo apt-get install -y mongodb-org
 sudo systemctl start mongod
 sudo systemctl status mongod
+mongosh
+use acp_research_dev_db
 cargo run --release
 ```

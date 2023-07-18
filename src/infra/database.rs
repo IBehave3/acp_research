@@ -1,8 +1,9 @@
 use crate::infra::collection;
 use crate::startup;
-use mongodb::options::{IndexOptions};
+use log::info;
+use mongodb::bson::doc;
+use mongodb::options::IndexOptions;
 use mongodb::IndexModel;
-use mongodb::{bson::doc};
 use mongodb::{options::ClientOptions, Client, Database};
 use std::sync::OnceLock;
 
@@ -65,7 +66,7 @@ pub async fn set_client_connection() {
 
     let db_conn_string = format!("mongodb://{host}:{port}/{database}");
 
-    println!("Info conn string: {db_conn_string}");
+    info!("conn string: {db_conn_string}");
 
     let client_options = match ClientOptions::parse(db_conn_string).await {
         Ok(client_options) => client_options,

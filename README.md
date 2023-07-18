@@ -20,6 +20,14 @@ service monogd stop
 service mongod status
 ```
 
+## Configurint API as Service
+```
+sudo cp /home/ubuntu/acp_research.service /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl start acp_research.service
+sudo systemctl status acp_research.service
+```
+
 ## Configuring API
 ```
 cp default.env .env

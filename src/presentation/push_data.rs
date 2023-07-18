@@ -5,7 +5,7 @@ use actix_web::web::Json;
 use actix_web::web::Query;
 use actix_web::{get, post, HttpResponse, Responder, Result};
 use chrono::Utc;
-use mongodb::{bson, bson::doc, bson::oid::ObjectId};
+use mongodb::{bson, bson::doc, bson::oid::ObjectId, bson::Document};
 
 #[get("/push-data")]
 pub async fn push_data_get_handler(query: Query<PushDataQueryExtractor>) -> Result<impl Responder> {
@@ -16,7 +16,14 @@ pub async fn push_data_get_handler(query: Query<PushDataQueryExtractor>) -> Resu
         None => return Ok(HttpResponse::NotFound().finish()),
     };
 
-    let filter = doc! { "idMappingRefId": id_mapping._id, "dataStructureId": query.data_structure_id.to_owned() };
+    let filter: Document;
+
+    if let Some(device_id) = query.device_id.to_owned() {
+        filter = doc! { "idMappingRefId": id_mapping._id, "dataStructureId": query.data_structure_id.to_owned(), "deviceId": device_id };
+    } else {
+        filter = doc! { "idMappingRefId": id_mapping._id, "dataStructureId": query.data_structure_id.to_owned() };
+    }
+
     let results = PushData::get_all_options(Some(filter), None).await?;
 
     Ok(HttpResponse::Ok().json(results))

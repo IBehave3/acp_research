@@ -1,13 +1,13 @@
 # acp_research 
-acp_research is an API built with Rust and MongoDb to store and analyze data.
+- acp_research is an API built with Rust and MongoDb to store and analyze data.
 
 ## Installation
-Tested using an Ubuntu LTS 22 
-Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation
-Use the mongodb site to https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu
+- Tested using an Ubuntu LTS 22 
+- Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation
+- Use the mongodb site to https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu
 
 ## Extra Tools
-MongoDb Gui utility https://www.mongodb.com/try/download/compass 
+- MongoDb Gui utility https://www.mongodb.com/try/download/compass 
 
 ## Managing Mongodb 
 ```bash
@@ -29,4 +29,39 @@ cp default.env .env
 ```bash
 cargo build
 cargo run
+```
+
+## Setting up Nginx
+```
+sudo apt update
+sudo apt install nginx
+sudo ufw app list
+sudo ufw allow 'Nginx HTTP'
+sudo ufw allow 'Nginx HTTPS'
+sudo ufw enable
+```
+
+## Connection to Test Server
+```
+ssh -i "AcpResearch.pem" ubuntu@ec2-18-207-248-247.compute-1.amazonaws.com
+```
+
+## Setup on Test Server
+```
+sudo apt install git
+sudo apt install gh
+sudo apt install gcc
+gh auth login
+gh repo clone https://github.com/IBehave3/acp_research
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+sudo apt-get install gnupg curl
+curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
+   --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl status mongod
+cargo run --release
 ```

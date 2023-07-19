@@ -29,7 +29,7 @@ pub async fn datastructure_post_handler(
         .data_structure_device_id_mapping
         .push(data_structure_mapping);
 
-    IdMapping::replace(id_mapping._id, id_mapping).await?;
+    IdMapping::replace(id_mapping._id, &id_mapping).await?;
 
     Ok(HttpResponse::Ok().finish())
 }

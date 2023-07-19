@@ -111,7 +111,7 @@ pub trait BaseCollection {
 
     async fn replace(
         oid: ObjectId,
-        doc: Self::DocumentType,
+        doc: &Self::DocumentType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let filter = doc! { "_id": oid };
         Self::replace_options(filter, doc).await?;
@@ -120,7 +120,7 @@ pub trait BaseCollection {
 
     async fn replace_options(
         filter: Document,
-        doc: Self::DocumentType,
+        doc: &Self::DocumentType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
         collection.replace_one(filter, doc, None).await?;

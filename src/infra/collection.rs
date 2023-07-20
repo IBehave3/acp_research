@@ -127,6 +127,11 @@ pub trait BaseCollection {
         Ok(())
     }
 
+    async fn update(filter: Document, update: Document) -> Result<(), Box<dyn std::error::Error>> {
+        Self::update_options(filter, update, None).await?;
+        Ok(())
+    }
+
     async fn update_options(
         filter: Document,
         update: Document,

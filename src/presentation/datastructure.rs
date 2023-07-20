@@ -12,11 +12,13 @@ pub async fn datastructure_post_handler(
     json: Json<DataStructureDeviceMapping>,
 ) -> Result<impl Responder> {
     let id_mapping = IdMapping::get_id_mapping_by_user_id(&query.user_id).await?;
-    let mut id_mapping = match id_mapping {
+    let id_mapping = match id_mapping {
         Some(id_mapping) => id_mapping,
         None => return Ok(HttpResponse::NotFound().finish()),
     };
     let data_structure_mapping = json.into_inner();
+
+    // NOTE: checking if dataStructureId exists
     let res = id_mapping
         .data_structure_device_id_mapping
         .iter()
@@ -26,23 +28,18 @@ pub async fn datastructure_post_handler(
         return Ok(HttpResponse::Conflict().finish());
     }
 
-    id_mapping
-        .data_structure_device_id_mapping
-        .push(data_structure_mapping);
-
-    let bson_data_structure_device_id_mapping =
-        match bson::to_bson(&id_mapping.data_structure_device_id_mapping) {
-            Ok(bson) => bson,
-            Err(err) => {
-                error!("{}", err);
-                return Ok(HttpResponse::InternalServerError().finish());
-            }
-        };
+    let bson_new_data_structure_id_mapping = match bson::to_bson(&data_structure_mapping) {
+        Ok(mapping) => mapping,
+        Err(err) => {
+            error!("{}", err);
+            return Ok(HttpResponse::InternalServerError().finish());
+        }
+    };
 
     let filter = doc! { "_id": id_mapping._id };
     let update =
-        doc! { "$set": { "dataStructureDeviceIdMapping": bson_data_structure_device_id_mapping }};
-    IdMapping::update_options(filter, update, None).await?;
+        doc! { "$push": { "dataStructureDeviceIdMapping": bson_new_data_structure_id_mapping }};
+    IdMapping::update(filter, update).await?;
 
     Ok(HttpResponse::Ok().finish())
 }

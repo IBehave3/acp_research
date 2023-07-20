@@ -48,8 +48,8 @@ pub async fn remove_user_delete_handler(
     let ref_filter = doc! { "idMappingRefId": id_mapping._id };
 
     IdMapping::delete(id_mapping._id).await?;
-    Notification::delete_options(ref_filter.clone(), None).await?;
-    PushData::delete_options(ref_filter, None).await?;
+    Notification::delete_all_options(ref_filter.clone(), None).await?;
+    PushData::delete_all_options(ref_filter, None).await?;
 
     Ok(HttpResponse::Ok().finish())
 }

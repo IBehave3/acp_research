@@ -3,6 +3,7 @@ use crate::model::auth::{DataStructureDeviceMapping, IdMapping, UserIdQueryExtra
 use crate::model::datastructure::DataStructureQueryExtractor;
 use crate::model::push_data::PushData;
 use actix_web::{get, post, web::Json, web::Query, HttpResponse, Responder, Result};
+use log::error;
 use mongodb::bson::doc;
 
 #[post("/data-structure")]
@@ -29,7 +30,19 @@ pub async fn datastructure_post_handler(
         .data_structure_device_id_mapping
         .push(data_structure_mapping);
 
-    IdMapping::replace(id_mapping._id, &id_mapping).await?;
+    let bson_data_structure_device_id_mapping =
+        match bson::to_bson(&id_mapping.data_structure_device_id_mapping) {
+            Ok(bson) => bson,
+            Err(err) => {
+                error!("{}", err);
+                return Ok(HttpResponse::InternalServerError().finish());
+            }
+        };
+
+    let filter = doc! { "_id": id_mapping._id };
+    let update =
+        doc! { "$set": { "dataStructureDeviceIdMapping": bson_data_structure_device_id_mapping }};
+    IdMapping::update_options(filter, update, None).await?;
 
     Ok(HttpResponse::Ok().finish())
 }
@@ -47,7 +60,7 @@ pub async fn reset_datastructure_get_handler(
 
     let filter = doc! { "dataStructureId": query.data_structure_id.to_owned(), "idMappingRefId": id_mapping._id };
 
-    PushData::delete_options(filter, None).await?;
+    PushData::delete_all_options(filter, None).await?;
 
     Ok(HttpResponse::Ok().finish())
 }

@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 use futures::stream::TryStreamExt;
 use log::info;
-use mongodb::options::DeleteOptions;
+use mongodb::options::{DeleteOptions, UpdateOptions};
 use mongodb::IndexModel;
 use mongodb::{bson::doc, options::FindOneOptions, options::FindOptions};
 use mongodb::{
@@ -127,13 +127,37 @@ pub trait BaseCollection {
         Ok(())
     }
 
+    async fn update_options(
+        filter: Document,
+        update: Document,
+        options: Option<UpdateOptions>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let collection = Self::get_collection();
+        collection.update_one(filter, update, options).await?;
+        Ok(())
+    }
+
     async fn delete(oid: ObjectId) -> Result<(), Box<dyn std::error::Error>> {
-        let filter = doc! { "_id": oid };
+        let filter = doc! { "_id" : oid};
         Self::delete_options(filter, None).await?;
         Ok(())
     }
 
     async fn delete_options(
+        filter: Document,
+        options: Option<DeleteOptions>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let collection = Self::get_collection();
+        collection.delete_one(filter, options).await?;
+        Ok(())
+    }
+
+    async fn delete_all() -> Result<(), Box<dyn std::error::Error>> {
+        Self::delete_all_options(doc! {}, None).await?;
+        Ok(())
+    }
+
+    async fn delete_all_options(
         filter: Document,
         options: Option<DeleteOptions>,
     ) -> Result<(), Box<dyn std::error::Error>> {

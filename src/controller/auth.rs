@@ -14,6 +14,13 @@ impl BaseCollection for IdMapping {
 }
 
 impl IdMapping {
+    pub async fn get_airthings_users() -> Result<Vec<IdMapping>, Box<dyn std::error::Error>> {
+        let filter = doc! { "dataStructureDeviceIdMapping.dataStructureId": "airthings".to_string() };
+        let results = IdMapping::get_all_options(Some(filter), None).await?;
+
+        Ok(results)
+    }
+
     pub async fn get_id_mapping_by_user_id(
         user_id: &str,
     ) -> Result<Option<Self>, Box<dyn std::error::Error>> {

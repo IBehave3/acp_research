@@ -5,6 +5,9 @@ use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
+use crate::infra::airthings_integ::start_airthings_poll;
+use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
+
 mod controller;
 mod infra;
 mod model;
@@ -16,6 +19,10 @@ pub async fn start_server() -> std::io::Result<()> {
         .expect("Error failed to init logger");
 
     on_startup().await;
+
+    // NOTE: start polling
+    start_airthings_poll();
+    start_uhoo_aura_poll();
 
     let api_config = match API_CONFIG.get() {
         Some(api_config) => api_config,
@@ -38,9 +45,11 @@ pub async fn start_server() -> std::io::Result<()> {
                 // NOTE: notification endpoints
                 .service(presentation::notification::notification_get_handler)
                 .service(presentation::notification::notification_post_handler)
-                // NOTE: device endpoints
+                // NOTE: datastructure endpoints
                 .service(presentation::datastructure::datastructure_post_handler)
                 .service(presentation::datastructure::reset_datastructure_get_handler)
+                // NOTE: device endpoints
+                .service(presentation::device::device_delete_handler)
                 .service(
                     web::scope("/auth")
                         // NOTE: auth endpoints

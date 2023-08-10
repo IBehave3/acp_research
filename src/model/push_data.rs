@@ -18,6 +18,8 @@ pub struct PushData {
     pub id_mapping_ref_id: ObjectId,
     #[serde(rename(serialize = "dataStructureId", deserialize = "dataStructureId"))]
     pub data_structure_id: String,
+    #[serde(rename(serialize = "deviceId", deserialize = "deviceId"))]
+    pub device_id: Option<String>,
     pub data: UserPushData,
 }
 

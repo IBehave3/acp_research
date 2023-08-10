@@ -47,6 +47,7 @@ pub async fn push_data_post_handler(
         created_at: bson::DateTime::from_chrono(Utc::now()),
         data_structure_id: query.data_structure_id.to_owned(),
         id_mapping_ref_id: id_mapping._id,
+        device_id: None,
         data: json.into_inner(),
     })
     .await?;

@@ -12,6 +12,7 @@ use reqwest::{Client, Response};
 use std::time::Duration;
 use std::thread;
 use mongodb::{bson, bson::oid::ObjectId};
+use log::{info, error};
 
 use crate::infra::collection::BaseCollection;
 use crate::model::auth::IdMapping;
@@ -54,35 +55,99 @@ pub async fn get_device_data(token: StandardTokenResponse<EmptyExtraTokenFields,
 
 pub fn start_airthings_poll() {
     thread::spawn(move || {
-        let rt = tokio::runtime::Builder::new_current_thread()
+        let rt = match tokio::runtime::Builder::new_current_thread()
         .enable_all()
-        .build().unwrap();
+        .build() {
+            Ok(rt) => rt,
+            Err(err) => {
+                error!("{err}");
+                panic!("unable to start airthings poll");
+            }
+        };
 
         loop {
-            let id_mappings = rt.block_on(IdMapping::get_airthings_users()).unwrap();
+            let id_mappings = match rt.block_on(IdMapping::get_airthings_users()) {
+                Ok(id_mappings) => id_mappings,
+                Err(err) => {
+                    error!("{err}");
+                    continue;
+                },
+            };
 
             for id_mapping in id_mappings {
                 for device_id_mapping in id_mapping.data_structure_device_id_mapping {
                     if device_id_mapping.data_structure_id.eq("airthings") {
-                        let client_id = device_id_mapping.auth.as_ref().unwrap().client_id.clone().unwrap();
-                        let client_secret = device_id_mapping.auth.as_ref().unwrap().client_secret.clone().unwrap();
-                        let group_id = device_id_mapping.auth.as_ref().unwrap().group_id.clone().unwrap();
+                        let client_id = match device_id_mapping.auth.as_ref().unwrap().client_id.clone() {
+                            Some(client_id) => client_id,
+                            None => {
+                                error!("no client_id found for arithings data structure");
+                                continue;
+                            }
+                        };
+                        let client_secret = match device_id_mapping.auth.as_ref().unwrap().client_secret.clone() {
+                            Some(client_secret) => client_secret,
+                            None => {
+                                error!("no client_secret found for arithings data structure");
+                                continue;
+                            }
+                        };
+                        let group_id = match device_id_mapping.auth.as_ref().unwrap().group_id.clone()  {
+                            Some(group_id) => group_id,
+                            None => {
+                                error!("no group_id found for arithings data structure");
+                                continue;
+                            }
+                        };
 
                         for device_id in device_id_mapping.device_ids.unwrap() {
-                            let token = rt.block_on(get_token(&client_id, &client_secret)).unwrap();
-                            let response = rt.block_on(get_device_data(token, &group_id, &device_id)).unwrap();
+                            let token = match rt.block_on(get_token(&client_id, &client_secret)) {
+                                Ok(token) => token,
+                                Err(err) => {
+                                    error!("{err}");
+                                    continue;
+                                }
+                            };
+                            let response = match rt.block_on(get_device_data(token, &group_id, &device_id)) {
+                                Ok(response) => response,
+                                Err(err) => {
+                                    error!("{err}");
+                                    continue;
+                                }
+                            };
 
                             if response.status() == 200 {
-                                println!("writing aithings_data to push_data");
-                                let bytes = rt.block_on(response.bytes()).unwrap();
-                                rt.block_on(PushData::add(PushData {
+                                let user_ref_id = id_mapping._id;
+                                info!("airthings writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
+
+                                let bytes = match rt.block_on(response.bytes()) {
+                                    Ok(bytes) => bytes,
+                                    Err(err) => {
+                                        error!("{err}");
+                                        continue;
+                                    }
+                                };
+                                let json = match serde_json::from_slice(&bytes[..]) {
+                                    Ok(json) => json,
+                                    Err(err) => {
+                                        error!("{err}");
+                                        continue;
+                                    }
+                                };
+
+                                match rt.block_on(PushData::add(PushData {
                                     _id: ObjectId::new(),
                                     device_id: Some(device_id),
                                     created_at: bson::DateTime::from_chrono(Utc::now()),
                                     data_structure_id: "airthings".to_string(),
-                                    id_mapping_ref_id: id_mapping._id,
-                                    data: serde_json::from_slice(&bytes[..]).unwrap(),
-                                })).unwrap();
+                                    id_mapping_ref_id: user_ref_id,
+                                    data: json,
+                                }))  {
+                                    Ok(_) => (),
+                                    Err(err) => {
+                                        error!("{err}");
+                                        continue;
+                                    }
+                                }
                             }
                         }
                     }

@@ -7,6 +7,7 @@ use startup::API_CONFIG;
 
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
+use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 
 mod controller;
 mod infra;
@@ -21,8 +22,9 @@ pub async fn start_server() -> std::io::Result<()> {
     on_startup().await;
 
     // NOTE: start polling
-    start_airthings_poll();
-    start_uhoo_aura_poll();
+    //start_airthings_poll();
+    //start_uhoo_aura_poll();
+    start_gray_wolf_poll();
 
     let api_config = match API_CONFIG.get() {
         Some(api_config) => api_config,

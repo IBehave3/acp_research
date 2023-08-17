@@ -12,6 +12,8 @@ pub struct Auth {
     pub client_secret: Option<String>,
     #[serde(rename(serialize = "groupId", deserialize = "groupId"))]
     pub group_id: Option<String>,
+    #[serde(rename(serialize = "apiKey", deserialize = "apiKey"))]
+    pub api_key: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -1,10 +1,10 @@
 use chrono::Utc;
-use serde_json::json;
+
 use core::panic;
 use log::{error, info};
-use mongodb::{bson, bson::doc, bson::oid::ObjectId};
+use mongodb::{bson, bson::oid::ObjectId};
 use reqwest::{Client, Response};
-use serde::{Deserialize, Serialize};
+
 use std::thread;
 use std::time::Duration;
 

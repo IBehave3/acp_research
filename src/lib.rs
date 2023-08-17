@@ -22,8 +22,8 @@ pub async fn start_server() -> std::io::Result<()> {
     on_startup().await;
 
     // NOTE: start polling
-    //start_airthings_poll();
-    //start_uhoo_aura_poll();
+    start_airthings_poll();
+    start_uhoo_aura_poll();
     start_gray_wolf_poll();
 
     let api_config = match API_CONFIG.get() {

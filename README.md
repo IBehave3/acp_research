@@ -1,6 +1,5 @@
 # acp_research 
-- acp_research is an API built with Rust and MongoDb to store and analyze data.
-
+- acp_research is an API built with Rust and MongoDb to store generic sensor data.
 ## Installation
 - Tested using an Ubuntu LTS 22 
 - Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation

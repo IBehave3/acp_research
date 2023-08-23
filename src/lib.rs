@@ -45,13 +45,12 @@ pub async fn start_server() -> std::io::Result<()> {
     info!("socket server listening at {host}:{socket_port}");
 
     // NOTE: web socket server
-    HttpServer::new(|| App::new().route("/socket", web::get().to(presentation::socket::socket_handler)))
-    .bind(("127.0.0.1", api_config.socketport))?
-    .run()
-    .await?;
+    let h1 = HttpServer::new(|| App::new().route("/socket", web::get().to(presentation::socket::socket_handler)))
+    .bind((host.clone(), api_config.socketport))?
+    .run();
 
     // NOTE: http server
-    HttpServer::new(|| {
+    let h2 = HttpServer::new(|| {
         App::new().wrap(Logger::default()).service(
             web::scope("/api")
                 // NOTE: test endpoints
@@ -83,8 +82,9 @@ pub async fn start_server() -> std::io::Result<()> {
         )
     })
     .bind((host.clone(), port))?
-    .run()
-    .await?;
+    .run();
+
+    futures::future::try_join(h1, h2).await?;
 
     Ok(())
 }

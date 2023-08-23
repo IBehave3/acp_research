@@ -14,5 +14,7 @@ pub struct SocketRequest {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct FitbitMessage {
-    data: Document,
+    pub data: Document,
+    #[serde(rename(serialize = "messageId", deserialize = "messageId"))]
+    pub message_id: String,
 }

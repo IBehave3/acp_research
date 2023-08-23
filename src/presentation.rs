@@ -5,3 +5,4 @@ pub mod manage;
 pub mod notification;
 pub mod push_data;
 pub mod test;
+pub mod socket;

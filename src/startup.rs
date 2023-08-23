@@ -9,6 +9,8 @@ use std::sync::OnceLock;
 pub struct ServerConfig {
     pub host: String,
     pub port: u16,
+    pub socketport: u16,
+    pub pollsensors: bool,
 }
 
 #[derive(Debug, Deserialize)]

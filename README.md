@@ -2,7 +2,7 @@
 - acp_research is an API built with Rust and MongoDb to store and analyze data.
 
 ## Installation
-- Tested using an Ubuntu LTS 22 
+- Tested using Ubuntu LTS 22 
 - Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation
 - Use the mongodb site to https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu
 

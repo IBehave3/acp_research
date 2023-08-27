@@ -1,55 +1,48 @@
-use crate::infra::collection::BaseCollection;
-use crate::model::auth::{CreateUserPostJsonExtractor, IdMapping, UserIdQueryExtractor};
-use crate::model::{notification::Notification, push_data::PushData};
-use actix_web::{delete, get, post, web::Json, web::Query, HttpResponse, Responder, Result};
-use mongodb::bson::doc;
-use mongodb::bson::oid::ObjectId;
+use crate::model::{auth::{CreateIdMapping, IdMapping, LoginIdMapping}, airthings::AirthingsAuth, gray_wolf::GrayWolfAuth, uhoo_aura::UhooAuraAuth};
+use actix_web::{get, post, web::Json, Responder, Result, patch};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 #[post("/create-user")]
 pub async fn create_user_post_handler(
-    query: Query<UserIdQueryExtractor>,
-    json: Json<CreateUserPostJsonExtractor>,
+    json: Json<CreateIdMapping>
 ) -> Result<impl Responder> {
-    if IdMapping::id_mapping_exists(&query.user_id).await? {
-        return Ok(HttpResponse::Conflict().finish());
-    }
-
-    let id_mapping = IdMapping {
-        _id: ObjectId::new(),
-        user_id: query.user_id.to_owned(),
-        data_structure_device_id_mapping: json.into_inner().data_structure_device_mapping,
-    };
-
-    IdMapping::add(id_mapping).await?;
-
-    Ok(HttpResponse::Ok().finish())
+    Ok(IdMapping::create(json.into_inner()).await?)
 }
 
 #[get("/login-user")]
-pub async fn login_user_get_handler(query: Query<UserIdQueryExtractor>) -> Result<impl Responder> {
-    let id_mapping = IdMapping::get_id_mapping_by_user_id(&query.user_id).await?;
-    let id_mapping = match id_mapping {
-        Some(id_mapping) => id_mapping,
-        None => return Ok(HttpResponse::NotFound().finish()),
-    };
-
-    Ok(HttpResponse::Ok().json(id_mapping))
+pub async fn login_user_get_handler(
+    json: Json<LoginIdMapping>
+) -> Result<impl Responder> {
+    Ok(IdMapping::login(json.into_inner()).await?)
 }
 
-#[delete("remove-user")]
-pub async fn remove_user_delete_handler(
-    query: Query<UserIdQueryExtractor>,
+#[get("/information-user")]
+pub async fn information_user_get_handler(
+    auth: BearerAuth
 ) -> Result<impl Responder> {
-    let id_mapping = IdMapping::get_id_mapping_by_user_id(&query.user_id).await?;
-    let id_mapping = match id_mapping {
-        Some(id_mapping) => id_mapping,
-        None => return Ok(HttpResponse::NotFound().finish()),
-    };
-    let ref_filter = doc! { "idMappingRefId": id_mapping._id };
+    Ok(IdMapping::get_by_token(auth.token()).await?)
+}
 
-    IdMapping::delete(id_mapping._id).await?;
-    Notification::delete_all_options(ref_filter.clone(), None).await?;
-    PushData::delete_all_options(ref_filter, None).await?;
+#[patch("airthings-user")]
+pub async fn airthings_user_patch_handler(
+    auth: BearerAuth,
+    airthings_auth: Json<AirthingsAuth>
+) -> Result<impl Responder> {
+    Ok(IdMapping::update_airthings(auth.token(), airthings_auth.into_inner()).await?)
+}
 
-    Ok(HttpResponse::Ok().finish())
+#[patch("gray-wolf-user")]
+pub async fn gray_wolf_user_patch_handler(
+    auth: BearerAuth,
+    gray_wolf_auth: Json<GrayWolfAuth>
+) -> Result<impl Responder> {
+    Ok(IdMapping::update_gray_wolf(auth.token(), gray_wolf_auth.into_inner()).await?)
+}
+
+#[patch("uhoo-aura-user")]
+pub async fn uhoo_aura_user_patch_handler(
+    auth: BearerAuth,
+    uhoo_aura_auth: Json<UhooAuraAuth>
+) -> Result<impl Responder> {
+    Ok(IdMapping::update_uhoo_aura(auth.token(), uhoo_aura_auth.into_inner()).await?)
 }

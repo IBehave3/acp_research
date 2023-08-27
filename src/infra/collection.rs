@@ -1,6 +1,7 @@
 use crate::infra::database;
 use async_trait::async_trait;
 
+use bson::Bson;
 use futures::stream::TryStreamExt;
 use log::info;
 use mongodb::options::{DeleteOptions, UpdateOptions};
@@ -14,6 +15,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 pub const ID_MAPPING_COLLECTION_NAME: &str = "id_mapping";
 pub const PUSH_DATA_COLLECTION_NAME: &str = "push_data";
+pub const GRAY_WOLF_COLLECTION_NAME: &str = "gray_wolf";
+pub const UHOO_AURA_COLLECTION_NAME: &str = "uhoo_aura";
+pub const AIRTHINGS_COLLECTION_NAME: &str = "airthings";
 pub const NOTIFICATION_COLLECTION_NAME: &str = "notification";
 pub const TEST_COLLECTION_NAME: &str = "test";
 
@@ -171,9 +175,9 @@ pub trait BaseCollection {
         Ok(())
     }
 
-    async fn add(doc: Self::DocumentType) -> Result<(), Box<dyn std::error::Error>> {
+    async fn add(doc: Self::DocumentType) -> Result<Bson, Box<dyn std::error::Error>> {
         let collection = Self::get_collection();
-        collection.insert_one(doc, None).await?;
-        Ok(())
+        let result = collection.insert_one(doc, None).await?;
+        Ok(result.inserted_id)
     }
 }

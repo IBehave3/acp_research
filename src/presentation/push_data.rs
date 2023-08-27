@@ -1,4 +1,4 @@
-use crate::infra::collection::BaseCollection;
+/*use crate::infra::collection::BaseCollection;
 use crate::model::auth::IdMapping;
 use crate::model::push_data::{PushData, PushDataQueryExtractor, UserPushData};
 use actix_web::web::Json;
@@ -53,4 +53,4 @@ pub async fn push_data_post_handler(
     .await?;
 
     Ok(HttpResponse::Ok().finish())
-}
+}*/

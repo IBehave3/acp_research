@@ -1,53 +1,50 @@
-
+use bson::DateTime;
 use mongodb::bson::doc;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Auth {
-    #[serde(rename(serialize = "clientId", deserialize = "clientId"))]
-    pub client_id: Option<String>,
-    #[serde(rename(serialize = "clientSecret", deserialize = "clientSecret"))]
-    pub client_secret: Option<String>,
-    #[serde(rename(serialize = "groupId", deserialize = "groupId"))]
-    pub group_id: Option<String>,
-    #[serde(rename(serialize = "apiKey", deserialize = "apiKey"))]
-    pub api_key: Option<String>
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DataStructureDeviceMapping {
-    #[serde(rename(serialize = "dataStructureId", deserialize = "dataStructureId"))]
-    pub data_structure_id: String,
-    #[serde(rename(serialize = "deviceIds", deserialize = "deviceIds"))]
-    pub device_ids: Option<HashSet<String>>,
-    pub auth: Option<Auth>,
-}
+use crate::model::airthings::AirthingsAuth;
+use crate::model::gray_wolf::GrayWolfAuth;
+use crate::model::uhoo_aura::UhooAuraAuth;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IdMapping {
-    pub _id: ObjectId,
-    #[serde(rename(serialize = "userId", deserialize = "userId"))]
-    pub user_id: String,
-    #[serde(rename(
-        serialize = "dataStructureDeviceIdMapping",
-        deserialize = "dataStructureDeviceIdMapping"
-    ))]
-    pub data_structure_device_id_mapping: Vec<DataStructureDeviceMapping>,
+    #[serde(rename(serialize = "_id", deserialize = "_id"))]
+    pub id: ObjectId,
+    #[serde(rename(serialize = "email", deserialize = "email"))]
+    pub email: String,
+    #[serde(rename(serialize = "createdAt", deserialize = "createdAt"))]
+    pub created_at: DateTime,
+    #[serde(rename(serialize = "passwordHash", deserialize = "passwordHash"))]
+    pub password_hash: String,
+    #[serde(rename(serialize = "salt", deserialize = "salt"))]
+    pub salt: String,
+    #[serde(rename(serialize = "airthings", deserialize = "airthings"))]
+    pub airthings: Option<AirthingsAuth>,
+    #[serde(rename(serialize = "grayWolf", deserialize = "grayWolf"))]
+    pub gray_wolf: Option<GrayWolfAuth>,
+    #[serde(rename(serialize = "uhooAura", deserialize = "uhooAura"))]
+    pub uhoo_aura: Option<UhooAuraAuth>,
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct UserIdQueryExtractor {
-    #[serde(rename(serialize = "userId", deserialize = "userId"))]
-    pub user_id: String,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateIdMapping {
+    #[serde(rename(serialize = "email", deserialize = "email"))]
+    pub email: String,
+    #[serde(rename(serialize = "password", deserialize = "password"))]
+    pub password: String,
+    #[serde(rename(serialize = "airthings", deserialize = "airthings"))]
+    pub airthings: Option<AirthingsAuth>,
+    #[serde(rename(serialize = "grayWolf", deserialize = "grayWolf"))]
+    pub gray_wolf: Option<GrayWolfAuth>,
+    #[serde(rename(serialize = "uhooAura", deserialize = "uhooAura"))]
+    pub uhoo_aura: Option<UhooAuraAuth>,
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct CreateUserPostJsonExtractor {
-    #[serde(rename(
-        serialize = "dataStructureDeviceMapping",
-        deserialize = "dataStructureDeviceMapping"
-    ))]
-    pub data_structure_device_mapping: Vec<DataStructureDeviceMapping>,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LoginIdMapping {
+    #[serde(rename(serialize = "email", deserialize = "email"))]
+    pub email: String,
+    #[serde(rename(serialize = "password", deserialize = "password"))]
+    pub password: String,
 }

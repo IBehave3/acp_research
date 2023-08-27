@@ -1,4 +1,4 @@
-use crate::infra::collection::BaseCollection;
+/*use crate::infra::collection::BaseCollection;
 use crate::model::auth::{DataStructureDeviceMapping, IdMapping, UserIdQueryExtractor};
 use crate::model::datastructure::DataStructureQueryExtractor;
 use crate::model::push_data::PushData;
@@ -60,4 +60,4 @@ pub async fn reset_datastructure_get_handler(
     PushData::delete_all_options(filter, None).await?;
 
     Ok(HttpResponse::Ok().finish())
-}
+}*/

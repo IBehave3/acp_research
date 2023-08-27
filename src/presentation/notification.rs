@@ -1,4 +1,4 @@
-use crate::infra::collection::BaseCollection;
+/*use crate::infra::collection::BaseCollection;
 use crate::model::auth::{IdMapping, UserIdQueryExtractor};
 use crate::model::notification::{Notification, UserNotification};
 use actix_web::web::{Json, Query};
@@ -39,4 +39,4 @@ pub async fn notification_post_handler(
     .await?;
 
     Ok(HttpResponse::Ok().finish())
-}
+}*/

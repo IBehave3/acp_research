@@ -1,4 +1,4 @@
-use crate::infra::{collection, collection::BaseCollection, database};
+/*use crate::infra::{collection, collection::BaseCollection, database};
 use crate::model::notification::Notification;
 use actix_web::Result;
 use mongodb::{bson::doc, bson::oid::ObjectId, Collection};
@@ -22,4 +22,4 @@ impl Notification {
 
         Ok(results)
     }
-}
+}*/

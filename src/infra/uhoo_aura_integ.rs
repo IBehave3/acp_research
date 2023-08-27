@@ -1,4 +1,4 @@
-use chrono::Utc;
+/*use chrono::Utc;
 use reqwest::{Client, Response};
 use serde::{Serialize, Deserialize};
 use core::panic;
@@ -152,4 +152,4 @@ pub fn start_uhoo_aura_poll() {
             thread::sleep(Duration::from_secs(QUERY_FREQ_SECS));
         }
     });
-}
+}*/

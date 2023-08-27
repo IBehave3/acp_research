@@ -1,9 +1,6 @@
 use crate::infra::collection;
 use crate::startup;
 use log::info;
-use mongodb::bson::doc;
-use mongodb::options::IndexOptions;
-use mongodb::IndexModel;
 use mongodb::{options::ClientOptions, Client, Database};
 use std::sync::OnceLock;
 
@@ -21,36 +18,12 @@ pub async fn init_db() {
 
     let db = &get_db_connection();
 
-    let options = IndexOptions::builder().unique(true).build();
-    let id_mapping_model = IndexModel::builder()
-        .keys(doc! { "userId": "text" })
-        .options(options)
-        .build();
-    let push_data_model = IndexModel::builder()
-        .keys(doc! { "createdAt": 1_u32  })
-        .build();
-    let notification_model = IndexModel::builder()
-        .keys(doc! { "timestamp": 1_u32  })
-        .build();
-
-    collection::create_collection(
-        db,
-        collection::ID_MAPPING_COLLECTION_NAME,
-        Some(id_mapping_model),
-    )
-    .await;
-    collection::create_collection(
-        db,
-        collection::PUSH_DATA_COLLECTION_NAME,
-        Some(push_data_model),
-    )
-    .await;
-    collection::create_collection(
-        db,
-        collection::NOTIFICATION_COLLECTION_NAME,
-        Some(notification_model),
-    )
-    .await;
+    collection::create_collection(db, collection::ID_MAPPING_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::PUSH_DATA_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::AIRTHINGS_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::GRAY_WOLF_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::UHOO_AURA_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::NOTIFICATION_COLLECTION_NAME, None).await;
     collection::create_collection(db, collection::TEST_COLLECTION_NAME, None).await;
 }
 

@@ -1,4 +1,4 @@
-use crate::infra::{collection, collection::BaseCollection, database};
+/*use crate::infra::{collection, collection::BaseCollection, database};
 use crate::model::push_data::PushData;
 
 impl BaseCollection for PushData {
@@ -9,4 +9,4 @@ impl BaseCollection for PushData {
 
         db.collection(collection::PUSH_DATA_COLLECTION_NAME)
     }
-}
+}*/

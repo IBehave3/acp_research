@@ -1,4 +1,4 @@
-use actix_web::web;
+/*use actix_web::web;
 use actix_web::{Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
@@ -11,4 +11,4 @@ pub async fn socket_handler(req: HttpRequest, stream: web::Payload) -> Result<Ht
     ws::start(socket::SocketRequest {
         socket_query: params.into_inner(),
     }, &req, stream)
-}
+}*/

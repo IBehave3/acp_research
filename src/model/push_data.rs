@@ -1,4 +1,4 @@
-use crate::model::auth::UserIdQueryExtractor;
+/*use crate::model::auth::UserIdQueryExtractor;
 use mongodb::{bson, bson::doc, bson::oid::ObjectId, bson::Document};
 use serde::{Deserialize, Serialize};
 
@@ -31,4 +31,4 @@ pub struct PushDataQueryExtractor {
     pub data_structure_id: String,
     #[serde(rename(serialize = "deviceId", deserialize = "deviceId"))]
     pub device_id: Option<String>,
-}
+}*/

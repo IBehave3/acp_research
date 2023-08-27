@@ -1,4 +1,4 @@
-use crate::{/*infra::collection::BaseCollection,*/ model::device::DeviceIdQueryExtractor};
+/*use crate::{/*infra::collection::BaseCollection,*/ model::device::DeviceIdQueryExtractor};
 
 //use crate::model::auth::IdMapping;
 use actix_web::{delete, post, web::Query, HttpResponse, Responder, Result};
@@ -43,4 +43,4 @@ pub async fn device_delete_handler(_query: Query<DeviceIdQueryExtractor>) -> Res
     IdMapping::update(filter, update).await?;*/
 
     Ok(HttpResponse::Ok().finish())
-}
+}*/

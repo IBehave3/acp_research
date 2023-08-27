@@ -1,4 +1,4 @@
-use crate::infra::collection::BaseCollection;
+/*use crate::infra::collection::BaseCollection;
 use crate::infra::{collection, database};
 use mongodb::bson::Document;
 use mongodb::Collection;
@@ -13,4 +13,4 @@ impl BaseCollection for Test {
 
         db.collection(collection::TEST_COLLECTION_NAME)
     }
-}
+}*/

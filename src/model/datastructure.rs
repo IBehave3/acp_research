@@ -1,4 +1,4 @@
-use super::auth::UserIdQueryExtractor;
+/*use super::auth::UserIdQueryExtractor;
 use bson::Document;
 use mongodb::bson::doc;
 use serde::{Deserialize, Serialize};
@@ -10,4 +10,4 @@ pub struct DataStructureQueryExtractor {
     #[serde(rename(serialize = "dataStructureId", deserialize = "dataStructureId"))]
     pub data_structure_id: String,
     pub metadata: Option<Document>,
-}
+}*/

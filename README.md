@@ -95,7 +95,7 @@ db.createUser(
   {
     user: "internal_user",
     pwd: "{internal_user_password}",
-    roles: [ { role: "readWrite", db: "acp_research_dev" } ]
+    roles: [ { role: "readWrite", db: "acp_research_dev_db" } ]
   }
 )
 
@@ -103,7 +103,15 @@ db.createUser(
   {
     user: "external_user",
     pwd: "{external_user_password}",
-    roles: [ { role: "read", db: "acp_research_dev" } ]
+    roles: [ { role: "read", db: "acp_research_dev_db" } ]
   }
 )
+```
+- Setup authentaction in /etc/mongodb.conf
+```
+security:
+  authorization: enabled
+net:
+  port: 27017
+  bindIp: 0.0.0.0
 ```

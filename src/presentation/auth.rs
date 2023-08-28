@@ -8,7 +8,7 @@ pub async fn create_user_post_handler(
     Ok(IdMapping::create(json.into_inner()).await?)
 }
 
-#[get("/login-user")]
+#[post("/login-user")]
 pub async fn login_user_get_handler(
     json: Json<LoginIdMapping>
 ) -> Result<impl Responder> {

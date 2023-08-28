@@ -20,6 +20,7 @@ dependencies = [
  "envy",
  "executor",
  "futures",
+ "futures-util",
  "jwt-simple",
  "log",
  "mongodb",

@@ -1,4 +1,4 @@
-use bson::DateTime;
+use bson::{DateTime, Document};
 use chrono::Utc;
 use log::{error, info};
 use oauth2::basic::{BasicClient, BasicTokenType};
@@ -11,7 +11,7 @@ use reqwest::{Client, Response};
 use std::thread;
 use std::time::Duration;
 
-use crate::model::airthings::{Airthings, AirthingsData};
+use crate::model::airthings::Airthings;
 use crate::infra::collection::BaseCollection;
 use crate::model::auth::IdMapping;
 
@@ -125,8 +125,8 @@ pub fn start_airthings_poll() {
                                 continue;
                             }
                         };
-                        let airthings_data: AirthingsData  = match serde_json::from_slice(&bytes[..]) {
-                            Ok(airthings_data) => airthings_data,
+                        let data: Document  = match serde_json::from_slice(&bytes[..]) {
+                            Ok(data) => data,
                             Err(err) => {
                                 error!("{err}");
                                 continue;
@@ -136,14 +136,14 @@ pub fn start_airthings_poll() {
                         let airthings = Airthings {
                             user_ref_id: id_mapping.id,
                             created_at: DateTime::from_chrono(Utc::now()),
-                            airthings_data: airthings_data.data,
+                            data,
                         };
 
                         match rt.block_on(Airthings::add(airthings)) {
                             Ok(_) => (),
                             Err(err) => {
                                 error!("{err}");
-                                ()
+                                
                             }
                         }
                     }

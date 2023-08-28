@@ -1,4 +1,4 @@
-use crate::controller::jwt;
+
 use crate::infra::{collection, collection::BaseCollection, database};
 use crate::model::airthings::AirthingsAuth;
 use crate::model::auth::{CreateIdMapping, IdMapping, LoginIdMapping};
@@ -7,7 +7,7 @@ use crate::model::jwt::{JwtClaims, JwtToken};
 use crate::model::uhoo_aura::UhooAuraAuth;
 use actix_web::{HttpResponse, Responder, Result};
 use bcrypt::hash_with_result;
-use bson::Bson;
+
 use bson::oid::ObjectId;
 use chrono::Utc;
 use mongodb::{bson::doc, bson::DateTime, Collection};
@@ -26,19 +26,9 @@ impl BaseCollection for IdMapping {
 
 impl IdMapping {
     pub async fn update_airthings(
-        token: &str,
+        email: &str,
         airthings_auth: AirthingsAuth,
     ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let claims = JwtToken::jwt_validate_token(JwtToken {
-            token: token.to_owned(),
-        })?;
-        match Self::get_by_email(&claims.custom.email).await? {
-            Some(id_mapping) => id_mapping,
-            None => {
-                return Ok(HttpResponse::NotFound().finish());
-            }
-        };
-
         let airthings_update = bson::to_document(&airthings_auth)?;
         let update = doc! {
             "$set": {
@@ -46,7 +36,7 @@ impl IdMapping {
             }
         };
         let filter = doc! {
-            "email": claims.custom.email,
+            "email": email,
         };
 
         IdMapping::update_options(filter, update, None).await?;
@@ -54,19 +44,9 @@ impl IdMapping {
     }
 
     pub async fn update_gray_wolf(
-        token: &str,
+        email: &str,
         gray_wolf_auth: GrayWolfAuth,
     ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let claims = JwtToken::jwt_validate_token(JwtToken {
-            token: token.to_owned(),
-        })?;
-        match Self::get_by_email(&claims.custom.email).await? {
-            Some(id_mapping) => id_mapping,
-            None => {
-                return Ok(HttpResponse::NotFound().finish());
-            }
-        };
-
         let gray_wolf_update = bson::to_document(&gray_wolf_auth)?;
         let update = doc! {
             "$set": {
@@ -74,7 +54,7 @@ impl IdMapping {
             }
         };
         let filter = doc! {
-            "email": claims.custom.email,
+            "email": email,
         };
 
         IdMapping::update_options(filter, update, None).await?;
@@ -82,19 +62,9 @@ impl IdMapping {
     }
 
     pub async fn update_uhoo_aura(
-        token: &str,
+        email: &str,
         uhoo_aura_auth: UhooAuraAuth,
     ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let claims = JwtToken::jwt_validate_token(JwtToken {
-            token: token.to_owned(),
-        })?;
-        match Self::get_by_email(&claims.custom.email).await? {
-            Some(id_mapping) => id_mapping,
-            None => {
-                return Ok(HttpResponse::NotFound().finish());
-            }
-        };
-
         let uhoo_aura_update = bson::to_document(&uhoo_aura_auth)?;
         let update = doc! {
             "$set": {
@@ -102,7 +72,7 @@ impl IdMapping {
             }
         };
         let filter = doc! {
-            "email": claims.custom.email,
+            "email": email,
         };
 
         IdMapping::update_options(filter, update, None).await?;
@@ -116,15 +86,11 @@ impl IdMapping {
             "email": email,
         };
 
-        Ok(IdMapping::get_options(Some(filter), None).await?)
+        IdMapping::get_options(Some(filter), None).await
     }
 
-    pub async fn get_by_token(token: &str) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let claims = JwtToken::jwt_validate_token(JwtToken {
-            token: token.to_owned(),
-        })?;
-
-        let id_mapping = Self::get_by_email(&claims.custom.email).await?;
+    pub async fn get_by_http_response_by_email(email: &str) -> Result<impl Responder, Box<dyn std::error::Error>> {
+        let id_mapping = Self::get_by_email(email).await?;
 
         if let Some(id_mapping) = id_mapping {
             Ok(HttpResponse::Ok().json(id_mapping))
@@ -181,6 +147,20 @@ impl IdMapping {
 
     pub async fn get_airthings_users() -> Result<Vec<IdMapping>, Box<dyn std::error::Error>> {
         let filter = doc! { "airthings": { "$ne": null } };
+        let results = IdMapping::get_all_options(Some(filter), None).await?;
+
+        Ok(results)
+    }
+
+    pub async fn get_gray_wolf_users() -> Result<Vec<IdMapping>, Box<dyn std::error::Error>> {
+        let filter = doc! { "grayWolf": { "$ne": null } };
+        let results = IdMapping::get_all_options(Some(filter), None).await?;
+
+        Ok(results)
+    }
+
+    pub async fn get_uhoo_aura_users() -> Result<Vec<IdMapping>, Box<dyn std::error::Error>> {
+        let filter = doc! { "uhooAura": { "$ne": null } };
         let results = IdMapping::get_all_options(Some(filter), None).await?;
 
         Ok(results)

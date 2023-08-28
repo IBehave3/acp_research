@@ -11,7 +11,6 @@ pub struct ServerConfig {
     pub port: u16,
     pub socketport: u16,
     pub pollsensors: bool,
-    pub opensocket: bool,
 }
 
 #[derive(Debug, Deserialize)]

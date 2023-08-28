@@ -1,4 +1,3 @@
-use crate::infra::database;
 use async_trait::async_trait;
 
 use bson::Bson;
@@ -14,12 +13,9 @@ use mongodb::{
 use serde::{de::DeserializeOwned, Serialize};
 
 pub const ID_MAPPING_COLLECTION_NAME: &str = "id_mapping";
-pub const PUSH_DATA_COLLECTION_NAME: &str = "push_data";
 pub const GRAY_WOLF_COLLECTION_NAME: &str = "gray_wolf";
 pub const UHOO_AURA_COLLECTION_NAME: &str = "uhoo_aura";
 pub const AIRTHINGS_COLLECTION_NAME: &str = "airthings";
-pub const NOTIFICATION_COLLECTION_NAME: &str = "notification";
-pub const TEST_COLLECTION_NAME: &str = "test";
 
 pub async fn create_collection(db: &Database, container_name: &str, model: Option<IndexModel>) {
     match db.create_collection(container_name, None).await {
@@ -38,32 +34,6 @@ pub async fn create_collection(db: &Database, container_name: &str, model: Optio
             }
         }
     };
-}
-
-pub async fn get_all_collection(
-    collection_name: &str,
-) -> Result<Vec<Document>, Box<dyn std::error::Error>> {
-    let db = database::get_db_connection();
-    let collection: Collection<Document> = db.collection(collection_name);
-    let mut cursor = collection.find(None, None).await?;
-    let mut results: Vec<Document> = Vec::new();
-
-    while cursor.advance().await? {
-        results.push(cursor.deserialize_current()?);
-    }
-
-    Ok(results)
-}
-
-pub async fn get_all_collection_names() -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let db = database::get_db_connection();
-    let mut results: Vec<String> = Vec::new();
-
-    for name in db.list_collection_names(None).await? {
-        results.push(name);
-    }
-
-    Ok(results)
 }
 
 #[async_trait]

@@ -22,6 +22,7 @@ pub async fn init_db() {
     collection::create_collection(db, collection::AIRTHINGS_COLLECTION_NAME, None).await;
     collection::create_collection(db, collection::GRAY_WOLF_COLLECTION_NAME, None).await;
     collection::create_collection(db, collection::UHOO_AURA_COLLECTION_NAME, None).await;
+    collection::create_collection(db, collection::FITBIT_COLLECTION_NAME, None).await;
 }
 
 pub async fn set_client_connection() {

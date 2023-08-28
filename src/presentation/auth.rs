@@ -1,6 +1,5 @@
-use crate::{model::{auth::{CreateIdMapping, IdMapping, LoginIdMapping}, airthings::AirthingsAuth, gray_wolf::GrayWolfAuth, uhoo_aura::UhooAuraAuth, jwt::{JwtToken, JwtClaims}}, infra::jwt_middleware::AuthenticatedClaims};
+use crate::{model::{auth::{CreateIdMapping, IdMapping, LoginIdMapping}, airthings::AirthingsAuth, gray_wolf::GrayWolfAuth, uhoo_aura::UhooAuraAuth}, infra::jwt_middleware::AuthenticatedClaims};
 use actix_web::{get, post, web::{Json, self}, Responder, Result, patch};
-use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 #[post("/create-user")]
 pub async fn create_user_post_handler(

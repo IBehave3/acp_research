@@ -8,7 +8,7 @@ use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
-use crate::controller::jwt;
+
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;
@@ -59,7 +59,12 @@ pub async fn start_server() -> std::io::Result<()> {
                         .service(presentation::auth::information_user_get_handler)
                         .service(presentation::auth::airthings_user_patch_handler)
                         .service(presentation::auth::gray_wolf_user_patch_handler)
-                        .service(presentation::auth::uhoo_aura_user_patch_handler)
+                        .service(presentation::auth::uhoo_aura_user_patch_handler),
+                )
+                .service(
+                    web::scope("/fitbit")
+                        .wrap(jwt_middleware::Auth)
+                        .service(presentation::fitbit::create_fitbit_post_handler),
                 ),
         )
     })

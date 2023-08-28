@@ -16,6 +16,7 @@ pub const ID_MAPPING_COLLECTION_NAME: &str = "id_mapping";
 pub const GRAY_WOLF_COLLECTION_NAME: &str = "gray_wolf";
 pub const UHOO_AURA_COLLECTION_NAME: &str = "uhoo_aura";
 pub const AIRTHINGS_COLLECTION_NAME: &str = "airthings";
+pub const FITBIT_COLLECTION_NAME: &str = "fitbit";
 
 pub async fn create_collection(db: &Database, container_name: &str, model: Option<IndexModel>) {
     match db.create_collection(container_name, None).await {

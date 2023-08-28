@@ -34,8 +34,10 @@ pub async fn set_client_connection() {
     let host = &db_config.host;
     let port = &db_config.port;
     let database = &db_config.database;
+    let username = &db_config.username;
+    let password = &db_config.password;
 
-    let db_conn_string = format!("mongodb://{host}:{port}/{database}");
+    let db_conn_string = format!("mongodb://{username}:{password}@{host}:{port}/{database}");
 
     info!("conn string: {db_conn_string}");
 

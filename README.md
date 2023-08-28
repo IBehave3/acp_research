@@ -72,3 +72,38 @@ use acp_research_dev_db
 cargo run --release
 sudo ./target/release/acp_research >> output.log 2>&1
 ```
+
+## Login db admin
+```
+mongosh admin -u {admin_username} -p {admin_password}
+```
+
+## Setup db auth
+```
+mongosh
+use admin
+db.createUser(
+  {
+    user: "admin",
+    pwd: "{admin_password}",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+)
+use {db_name}
+
+db.createUser(
+  {
+    user: "internal_user",
+    pwd: "{internal_user_password}",
+    roles: [ { role: "readWrite", db: "acp_research_dev" } ]
+  }
+)
+
+db.createUser(
+  {
+    user: "external_user",
+    pwd: "{external_user_password}",
+    roles: [ { role: "read", db: "acp_research_dev" } ]
+  }
+)
+```

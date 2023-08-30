@@ -1,7 +1,9 @@
-
 use crate::infra::{collection, collection::BaseCollection, database};
 use crate::model::airthings::AirthingsAuth;
-use crate::model::auth::{CreateIdMapping, IdMapping, LoginIdMapping};
+use crate::model::auth::{
+    CreateIdMapping, IdMapping, IdMappingSensorAuth, IdMappingUserAuth, IdMappingUserInformation,
+    LoginIdMapping,
+};
 use crate::model::gray_wolf::GrayWolfAuth;
 use crate::model::jwt::{JwtCustomClaims, JwtToken};
 use crate::model::uhoo_aura::UhooAuraAuth;
@@ -63,6 +65,22 @@ impl IdMapping {
         Ok(HttpResponse::Ok().finish())
     }
 
+    pub async fn update_user_information(
+        username: &str,
+        user_information: IdMappingUserInformation
+    ) -> Result<impl Responder, Box<dyn std::error::Error>> {
+        let user_information_update = bson::to_document(&user_information)?;
+        let update = doc! {
+            "$set": user_information_update
+        };
+        let filter = doc! {
+            "username": username,
+        };
+
+        IdMapping::update_options(filter, update, None).await?;
+        Ok(HttpResponse::Ok().finish())
+    }
+
     pub async fn update_uhoo_aura(
         username: &str,
         uhoo_aura_auth: UhooAuraAuth,
@@ -91,7 +109,9 @@ impl IdMapping {
         IdMapping::get_options(Some(filter), None).await
     }
 
-    pub async fn get_by_http_response_by_email(username: &str) -> Result<impl Responder, Box<dyn std::error::Error>> {
+    pub async fn get_by_http_response_by_email(
+        username: &str,
+    ) -> Result<impl Responder, Box<dyn std::error::Error>> {
         let id_mapping = Self::get_by_username(username).await?;
 
         if let Some(id_mapping) = id_mapping {
@@ -105,12 +125,16 @@ impl IdMapping {
         create_id_mapping: CreateIdMapping,
     ) -> Result<impl Responder, Box<dyn std::error::Error>> {
         if create_id_mapping.username.len() <= MIN_USERNAME_LEN {
-            return Ok(HttpResponse::BadRequest().body(format!("invalid username min characters: {MIN_USERNAME_LEN}")));
+            return Ok(HttpResponse::BadRequest().body(format!(
+                "invalid username min characters: {MIN_USERNAME_LEN}"
+            )));
         }
         if create_id_mapping.password.len() <= MIN_PASSWORD_LEN {
-            return Ok(HttpResponse::BadRequest().body(format!("invalid username min characters: {MIN_PASSWORD_LEN}")));
+            return Ok(HttpResponse::BadRequest().body(format!(
+                "invalid username min characters: {MIN_PASSWORD_LEN}"
+            )));
         }
-        
+
         if Self::get_by_username(&create_id_mapping.username)
             .await?
             .is_some()
@@ -122,21 +146,29 @@ impl IdMapping {
 
         let inserted_id = IdMapping::add(IdMapping {
             id: ObjectId::new(),
-            username: create_id_mapping.username,
             created_at: DateTime::from_chrono(Utc::now()),
-            password_hash: hash.to_string(),
-            salt: hash.get_salt(),
-            airthings: create_id_mapping.airthings,
-            gray_wolf: create_id_mapping.gray_wolf,
-            uhoo_aura: create_id_mapping.uhoo_aura,
-            age: create_id_mapping.age,
-            gender: create_id_mapping.gender,
-            race: create_id_mapping.race,
-            birth_location: create_id_mapping.birth_location,
-            home_original_location: create_id_mapping.home_original_location,
-            home_last_five_years_location: create_id_mapping.home_last_five_years_location,
-            employment_status: create_id_mapping.employment_status,
-            level_of_education: create_id_mapping.level_of_education,
+            user_auth: IdMappingUserAuth {
+                username: create_id_mapping.username,
+                password_hash: hash.to_string(),
+                salt: hash.get_salt(),
+            },
+            sensor_auth: IdMappingSensorAuth {
+                airthings: create_id_mapping.sensor_auth.airthings,
+                gray_wolf: create_id_mapping.sensor_auth.gray_wolf,
+                uhoo_aura: create_id_mapping.sensor_auth.uhoo_aura,
+            },
+            user_information: IdMappingUserInformation {
+                age: create_id_mapping.user_information.age,
+                gender: create_id_mapping.user_information.gender,
+                race: create_id_mapping.user_information.race,
+                birth_location: create_id_mapping.user_information.birth_location,
+                home_original_location: create_id_mapping.user_information.home_original_location,
+                home_last_five_years_location: create_id_mapping
+                    .user_information
+                    .home_last_five_years_location,
+                employment_status: create_id_mapping.user_information.employment_status,
+                level_of_education: create_id_mapping.user_information.level_of_education,
+            },
         })
         .await?;
 
@@ -153,7 +185,7 @@ impl IdMapping {
             }
         };
 
-        if !(bcrypt::verify(login_id_mapping.password, &id_mapping.password_hash)?) {
+        if !(bcrypt::verify(login_id_mapping.password, &id_mapping.user_auth.password_hash)?) {
             return Ok(HttpResponse::Unauthorized().finish());
         }
 

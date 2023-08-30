@@ -85,7 +85,7 @@ pub fn start_airthings_poll() {
             };
 
             for id_mapping in id_mappings {
-                let airthings = match id_mapping.airthings {
+                let airthings = match id_mapping.sensor_auth.airthings {
                     Some(airthings) => airthings,
                     None => {
                         error!("user {} airthings was null", id_mapping.id);

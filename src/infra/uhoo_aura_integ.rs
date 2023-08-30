@@ -81,7 +81,7 @@ pub fn start_uhoo_aura_poll() {
             };
 
             for id_mapping in id_mappings {
-                let uhoo_aura = match id_mapping.uhoo_aura {
+                let uhoo_aura = match id_mapping.sensor_auth.uhoo_aura {
                     Some(uhoo_aura) => uhoo_aura,
                     None => {
                         error!("user {} uhoo_aura was null", id_mapping.id);

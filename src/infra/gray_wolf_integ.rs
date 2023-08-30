@@ -53,7 +53,7 @@ pub fn start_gray_wolf_poll() {
             };
 
             for id_mapping in id_mappings {
-                let gray_wolf = match id_mapping.gray_wolf {
+                let gray_wolf = match id_mapping.sensor_auth.gray_wolf {
                     Some(gray_wolf) => gray_wolf,
                     None => {
                         error!("user {} gray_wolf was null", id_mapping.id);

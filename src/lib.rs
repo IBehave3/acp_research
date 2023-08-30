@@ -59,7 +59,8 @@ pub async fn start_server() -> std::io::Result<()> {
                         .service(presentation::auth::information_user_get_handler)
                         .service(presentation::auth::airthings_user_patch_handler)
                         .service(presentation::auth::gray_wolf_user_patch_handler)
-                        .service(presentation::auth::uhoo_aura_user_patch_handler),
+                        .service(presentation::auth::uhoo_aura_user_patch_handler)
+                        .service(presentation::auth::update_user_information),
                 )
                 .service(
                     web::scope("/fitbit")

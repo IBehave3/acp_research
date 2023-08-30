@@ -21,8 +21,8 @@ impl BaseCollection for Fitbit {
 }
 
 impl Fitbit {
-    pub async fn create_fitbit_data(email: &str, data: Document) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let id_mapping = match IdMapping::get_by_email(email).await? {
+    pub async fn create_fitbit_data(username: &str, data: Document) -> Result<impl Responder, Box<dyn std::error::Error>> {
+        let id_mapping = match IdMapping::get_by_username(username).await? {
             Some(id_mapping) => id_mapping,
             None => {
                 return Ok(HttpResponse::NotFound().finish());

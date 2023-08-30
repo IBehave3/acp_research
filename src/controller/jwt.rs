@@ -1,4 +1,4 @@
-use crate::model::jwt::{JwtClaims, JwtToken};
+use crate::model::jwt::{JwtCustomClaims, JwtToken};
 use jwt_simple::prelude::*;
 use log::info;
 use std::fs::File;
@@ -39,7 +39,7 @@ impl JwtToken {
         JWT_KEY.set(key).unwrap();
     }
 
-    pub fn jwt_validate_token(self) -> Result<JWTClaims<JwtClaims>, Box<dyn std::error::Error>> {
+    pub fn jwt_validate_token(self) -> Result<JWTClaims<JwtCustomClaims>, Box<dyn std::error::Error>> {
         let key = match JWT_KEY.get() {
             Some(key) => key,
             None => {
@@ -47,11 +47,11 @@ impl JwtToken {
             }
         };
 
-        let claims = key.verify_token::<JwtClaims>(&self.token, None)?;
+        let claims = key.verify_token::<JwtCustomClaims>(&self.token, None)?;
         Ok(claims)
     }
 
-    pub fn new(jwt_claims: JwtClaims) -> Result<JwtToken, Box<dyn std::error::Error>> {
+    pub fn new(jwt_claims: JwtCustomClaims) -> Result<JwtToken, Box<dyn std::error::Error>> {
         let claims = Claims::with_custom_claims(
             jwt_claims,
             Duration::from_hours(JWT_EXPIRATION_DURATION_IN_HOURS),

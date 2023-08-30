@@ -19,7 +19,7 @@ pub struct AuthMiddleware<S> {
 #[derive(Clone)]
 
 pub struct AuthenticatedClaims {
-    pub email: String,
+    pub username: String,
 }
 
 impl<S, B> Transform<S, ServiceRequest> for Auth
@@ -84,7 +84,7 @@ where
 
             request.extensions_mut()
                 .insert(AuthenticatedClaims {
-                    email: jwt_claims.custom.email,
+                    username: jwt_claims.custom.username,
                 });
 
             let res = self.service.call(request);

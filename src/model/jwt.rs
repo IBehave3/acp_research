@@ -8,7 +8,7 @@ pub struct JwtToken {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct JwtClaims {
-    #[serde(rename(serialize = "email", deserialize = "email"))]
-    pub email: String,
+pub struct JwtCustomClaims {
+    #[serde(rename(serialize = "username", deserialize = "username"))]
+    pub username: String,
 }

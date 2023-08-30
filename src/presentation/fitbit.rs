@@ -7,5 +7,5 @@ pub async fn create_fitbit_post_handler(
     authenticated_claims: web::ReqData<AuthenticatedClaims>,
     data: Json<Document>
 ) -> Result<impl Responder> {
-    Ok(Fitbit::create_fitbit_data(&authenticated_claims.email, data.into_inner()).await?)
+    Ok(Fitbit::create_fitbit_data(&authenticated_claims.username, data.into_inner()).await?)
 }

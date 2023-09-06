@@ -19,6 +19,7 @@ pub struct AuthMiddleware<S> {
 #[derive(Clone)]
 
 pub struct AuthenticatedClaims {
+    pub user_id: i32,
     pub username: String,
 }
 
@@ -84,6 +85,7 @@ where
 
             request.extensions_mut()
                 .insert(AuthenticatedClaims {
+                    user_id: jwt_claims.custom.user_id,
                     username: jwt_claims.custom.username,
                 });
 

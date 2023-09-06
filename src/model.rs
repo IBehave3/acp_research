@@ -4,3 +4,4 @@ pub mod uhoo_aura;
 pub mod airthings;
 pub mod gray_wolf;
 pub mod fitbit;
+pub mod user_model;

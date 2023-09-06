@@ -23,8 +23,15 @@ pub struct DbConfig {
     pub database: String,
 }
 
+#[derive(Debug, Deserialize)]
+#[allow(dead_code, non_snake_case)]
+pub struct  DatabaseConfig {
+    pub database_url: String,
+}
+
 pub static API_CONFIG: OnceLock<ServerConfig> = OnceLock::new();
 pub static DB_CONFIG: OnceLock<DbConfig> = OnceLock::new();
+pub static DATABASE_CONFIG: OnceLock<DatabaseConfig> = OnceLock::new();
 
 pub async fn on_startup() {
     init_config();
@@ -51,4 +58,13 @@ fn init_config() {
     DB_CONFIG
         .set(db_config)
         .expect("Error DB_CONFIG should only be set once");
+
+    let database_config = match envy::from_env::<DatabaseConfig>() {
+        Ok(config) => config,
+        Err(error) => panic!("Error: {:#?}", error),
+    };
+
+    DATABASE_CONFIG
+        .set(database_config)
+        .expect("Error DATABASE_CONFIG should only be set once");
 }

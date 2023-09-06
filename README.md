@@ -4,20 +4,11 @@
 ## Installation
 - Tested using Ubuntu LTS 22 
 - Use the rust book guide https://doc.rust-lang.org/book/ch01-01-installation.html#installation
-- Use the mongodb site to https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu
+- Use the postgres site to https://ubuntu.com/server/docs/databases-postgresql
 
-## Extra Tools
-- MongoDb Gui utility https://www.mongodb.com/try/download/compass 
+## Managing PostgrsQL Database 
+```
 
-## Managing Mongodb 
-```bash
-sudo systemctl enable mongod
-sudo systemctl stop mongod
-sudo systemctl restart mongod
-
-service mongod start
-service monogd stop
-service mongod status
 ```
 
 ## Configurint API as Service
@@ -53,65 +44,40 @@ sudo systemctl restart nginx
 ssh -i "AcpResearch.pem" ubuntu@ec2-18-207-248-247.compute-1.amazonaws.com
 ```
 
-## Setup on Test Server
+## Setup on Rust
 ```
-sudo apt install git gh gcc
+sudo apt install git gh gcc libssl-dev
 gh auth login
 gh repo clone https://github.com/IBehave3/acp_research
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
-   sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
-   --dearmor
-echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-sudo apt-get update
-sudo apt-get install -y mongodb-org
-sudo systemctl start mongod
-sudo systemctl status mongod
-mongosh
-use acp_research_dev_db
-cargo run --release
-sudo ./target/release/acp_research >> output.log 2>&1
 ```
 
-## Login db admin
+## Setup PostgresQL
 ```
-mongosh admin -u {admin_username} -p {admin_password}
+sudo apt install postgresql postgresql-client
+sudo -u postgres psql
+#login
+CREATE DATABASE acp_research_db;
+CREATE ROLE internal_user LOGIN PASSWORD 'password';
+CREATE ROLE external_user LOGIN PASSWORD 'password';
+GRANT ALL ON DATABASE acp_research_db TO internal_user;
+#logout
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO external_user;
+#login
 ```
 
-## Setup db auth
+## Setup Diesel
 ```
-mongosh
-use admin
-db.createUser(
-  {
-    user: "admin",
-    pwd: "{admin_password}",
-    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
-  }
-)
-use {db_name}
+sudo apt install libpq-dev
+cargo install diesel_cli --no-default-features --features postgres
+```
 
-db.createUser(
-  {
-    user: "internal_user",
-    pwd: "{internal_user_password}",
-    roles: [ { role: "readWrite", db: "acp_research_dev_db" } ]
-  }
-)
+## Login db internal_user
+```
+psql -h localhost -U internal_user -d acp_research_db
+```
 
-db.createUser(
-  {
-    user: "external_user",
-    pwd: "{external_user_password}",
-    roles: [ { role: "read", db: "acp_research_dev_db" } ]
-  }
-)
+## Allow outside connections in /etc/postgresql/*/main/postgresql.conf
 ```
-- Setup authentaction in /etc/mongodb.conf
-```
-security:
-  authorization: enabled
-net:
-  port: 27017
-  bindIp: 0.0.0.0
+listen_addresses = '*'
 ```

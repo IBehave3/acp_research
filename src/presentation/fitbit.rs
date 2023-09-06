@@ -1,4 +1,4 @@
-use crate::{model::{fitbit::Fitbit}, infra::jwt_middleware::AuthenticatedClaims};
+use crate::{model::fitbit::Fitbit, infra::jwt_middleware::AuthenticatedClaims};
 use actix_web::{post, web::{Json, self}, Responder, Result};
 use bson::Document;
 

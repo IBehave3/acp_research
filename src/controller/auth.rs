@@ -29,24 +29,6 @@ impl BaseCollection for IdMapping {
 }
 
 impl IdMapping {
-    pub async fn update_airthings(
-        username: &str,
-        airthings_auth: AirthingsAuth,
-    ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let airthings_update = bson::to_document(&airthings_auth)?;
-        let update = doc! {
-            "$set": {
-                "airthings": airthings_update
-            }
-        };
-        let filter = doc! {
-            "username": username,
-        };
-
-        IdMapping::update_options(filter, update, None).await?;
-        Ok(HttpResponse::Ok().finish())
-    }
-
     pub async fn update_gray_wolf(
         username: &str,
         gray_wolf_auth: GrayWolfAuth,
@@ -119,79 +101,6 @@ impl IdMapping {
         } else {
             Ok(HttpResponse::NotFound().finish())
         }
-    }
-
-    pub async fn create(
-        create_id_mapping: CreateIdMapping,
-    ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        if create_id_mapping.username.len() <= MIN_USERNAME_LEN {
-            return Ok(HttpResponse::BadRequest().body(format!(
-                "invalid username min characters: {MIN_USERNAME_LEN}"
-            )));
-        }
-        if create_id_mapping.password.len() <= MIN_PASSWORD_LEN {
-            return Ok(HttpResponse::BadRequest().body(format!(
-                "invalid username min characters: {MIN_PASSWORD_LEN}"
-            )));
-        }
-
-        if Self::get_by_username(&create_id_mapping.username)
-            .await?
-            .is_some()
-        {
-            return Ok(HttpResponse::Conflict().finish());
-        }
-
-        let hash = hash_with_result(create_id_mapping.password, BCRYPT_ITERATIONS)?;
-
-        let inserted_id = IdMapping::add(IdMapping {
-            id: ObjectId::new(),
-            created_at: DateTime::from_chrono(Utc::now()),
-            user_auth: IdMappingUserAuth {
-                username: create_id_mapping.username,
-                password_hash: hash.to_string(),
-                salt: hash.get_salt(),
-            },
-            sensor_auth: IdMappingSensorAuth {
-                airthings: create_id_mapping.sensor_auth.airthings,
-                gray_wolf: create_id_mapping.sensor_auth.gray_wolf,
-                uhoo_aura: create_id_mapping.sensor_auth.uhoo_aura,
-            },
-            user_information: IdMappingUserInformation {
-                age: create_id_mapping.user_information.age,
-                gender: create_id_mapping.user_information.gender,
-                race: create_id_mapping.user_information.race,
-                birth_location: create_id_mapping.user_information.birth_location,
-                home_original_location: create_id_mapping.user_information.home_original_location,
-                home_last_five_years_location: create_id_mapping
-                    .user_information
-                    .home_last_five_years_location,
-                employment_status: create_id_mapping.user_information.employment_status,
-                level_of_education: create_id_mapping.user_information.level_of_education,
-            },
-        })
-        .await?;
-
-        Ok(HttpResponse::Ok().json(inserted_id))
-    }
-
-    pub async fn login(
-        login_id_mapping: LoginIdMapping,
-    ) -> Result<impl Responder, Box<dyn std::error::Error>> {
-        let id_mapping = match Self::get_by_username(&login_id_mapping.username).await? {
-            Some(id_mapping) => id_mapping,
-            None => {
-                return Ok(HttpResponse::NotFound().finish());
-            }
-        };
-
-        if !(bcrypt::verify(login_id_mapping.password, &id_mapping.user_auth.password_hash)?) {
-            return Ok(HttpResponse::Unauthorized().finish());
-        }
-
-        Ok(HttpResponse::Ok().json(JwtToken::new(JwtCustomClaims {
-            username: login_id_mapping.username,
-        })?))
     }
 
     pub async fn get_airthings_users() -> Result<Vec<IdMapping>, Box<dyn std::error::Error>> {

@@ -6,12 +6,13 @@ use log::{error, info};
 
 use diesel::result::{DatabaseErrorKind, Error as diesel_error};
 use diesel::{self, ExpressionMethods, QueryDsl, SelectableHelper};
-use diesel_async::RunQueryDsl;
+use diesel_async::{RunQueryDsl, AsyncPgConnection};
 
 use crate::infra::api_error;
 use crate::infra::api_error::ApiError;
 use crate::infra::database::DbPool;
 use crate::infra::jwt_middleware::AuthenticatedClaims;
+use crate::model::airthings_model::Airthings;
 use crate::model::jwt::{JwtCustomClaims, JwtToken};
 use crate::model::user_model::{
     ClientCreateUser, ClientGetUserInformation, ClientLoginUser, ClientUpdateUserAirthings,
@@ -285,4 +286,14 @@ pub async fn update_user_uhoo_aura(
     };
 
     Ok(HttpResponse::Ok().finish())
+}
+
+pub async fn get_airthings_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserAirthings>> {
+    info!("HERE");
+    let airthings_users: Vec<UserAirthings> = user_airthings
+        .select(UserAirthings::as_select())
+        .load(connection)
+        .await?;
+
+    Ok(airthings_users)
 }

@@ -1,5 +1,6 @@
 use bson::{DateTime, Document};
 use chrono::Utc;
+use diesel_async::AsyncPgConnection;
 use log::{error, info};
 use oauth2::basic::{BasicClient, BasicTokenType};
 use oauth2::reqwest::async_http_client;
@@ -8,12 +9,15 @@ use oauth2::{
     TokenResponse, TokenUrl,
 };
 use reqwest::{Client, Response};
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-use crate::model::airthings::Airthings;
+use crate::controller::{user_controller, airthings_controller};
 use crate::infra::collection::BaseCollection;
-use crate::model::auth::IdMapping;
+use crate::model::airthings_model::ClientAirthings;
+
+use super::database::DbPool;
 
 const QUERY_FREQ_SECS: u64 = 300;
 
@@ -56,13 +60,13 @@ pub async fn get_device_data(
         .await?;
 
     if response.status() == 401 {
-        println!("token has expired");
+        info!("token has expired");
     }
 
     Ok(response)
 }
 
-pub fn start_airthings_poll() {
+pub fn start_airthings_poll(pool: Arc<DbPool>) {
     thread::spawn(move || {
         let rt = match tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -75,29 +79,36 @@ pub fn start_airthings_poll() {
             }
         };
 
+        let connection = &mut rt.block_on(pool.get()).unwrap();
+
         loop {
-            let id_mappings = match rt.block_on(IdMapping::get_airthings_users()) {
-                Ok(id_mappings) => id_mappings,
+            let user_airthings: Vec<crate::model::user_model::UserAirthings> = match rt.block_on(user_controller::get_airthings_users(connection)) {
+                Ok(users) => users,
                 Err(err) => {
                     error!("{err}");
                     continue;
                 }
             };
 
-            for id_mapping in id_mappings {
-                let airthings = match id_mapping.sensor_auth.airthings {
-                    Some(airthings) => airthings,
+            for user_airthing in user_airthings {
+                let device_ids = match user_airthing.deviceids {
+                    Some(device_ids) => device_ids,
                     None => {
-                        error!("user {} airthings was null", id_mapping.id);
                         continue;
-                    },
+                    }
                 };
+                let client_id = user_airthing.clientid;
+                let client_secret = user_airthing.clientsecret;
+                let group_id = user_airthing.groupid;
 
-                let client_id = airthings.client_id;
-                let client_secret = airthings.client_secret;
-                let group_id = airthings.group_id;
+                for device_id in device_ids {
+                    let device_id = match device_id {
+                        Some(device_id) => device_id,
+                        None => {
+                            continue;
+                        }
+                    };
 
-                for device_id in airthings.device_ids{
                     let token = match rt.block_on(get_token(&client_id, &client_secret)) {
                         Ok(token) => token,
                         Err(err) => {
@@ -114,37 +125,29 @@ pub fn start_airthings_poll() {
                         }
                     };
 
+                    println!("{}", response.status());
+
                     if response.status() == 200 {
-                        let user_ref_id = id_mapping.id;
+                        let user_ref_id = user_airthing.userid;
                         info!("airthings writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
 
                         let bytes = match rt.block_on(response.bytes()) {
                             Ok(bytes) => bytes,
                             Err(err) => {
-                                error!("{err}");
+                                error!("retrieving bytes {err}");
                                 continue;
                             }
                         };
-                        let data: Document  = match serde_json::from_slice(&bytes[..]) {
+                        let data: ClientAirthings  = match serde_json::from_slice(&bytes[..]) {
                             Ok(data) => data,
                             Err(err) => {
-                                error!("{err}");
+                                error!("serde_json {err}");
                                 continue;
                             }
                         };
 
-                        let airthings = Airthings {
-                            user_ref_id: id_mapping.id,
-                            created_at: DateTime::from_chrono(Utc::now()),
-                            data,
-                        };
-
-                        match rt.block_on(Airthings::add(airthings)) {
-                            Ok(_) => (),
-                            Err(err) => {
-                                error!("{err}");
-                                
-                            }
+                        if let Err(err) = rt.block_on(airthings_controller::create_airthings(connection, data, user_ref_id)) {
+                            error!("create_airthings {err}");
                         }
                     }
                 }

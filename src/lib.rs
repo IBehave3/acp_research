@@ -1,4 +1,5 @@
 use core::panic;
+use std::sync::Arc;
 
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer, web::Data};
@@ -12,9 +13,9 @@ use startup::on_startup;
 use startup::API_CONFIG;
 
 use crate::infra::airthings_integ::start_airthings_poll;
-use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
+//use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;
-use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
+//use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
 use crate::model::jwt::JwtToken;
 use crate::startup::DATABASE_CONFIG;
 
@@ -42,28 +43,32 @@ pub async fn start_server() -> std::io::Result<()> {
         None => panic!("Error DATABASE_CONFIG not initialized"),
     };
 
-    // NOTE: start polling
-    if api_config.pollsensors {
-        start_airthings_poll();
-        start_uhoo_aura_poll();
-        start_gray_wolf_poll();
-    }
-
     let host = &api_config.host;
     let port = api_config.port;
     let database_connection_string = &database_config.database_url;
 
     let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_connection_string);
-    let pool = match Pool::builder(config).build() {
+    let pool = match Pool::builder(config).max_size(15).build() {
         Ok(pool) => pool,
         Err(err) => {
             panic!("{err}");
         }
     };
 
+    let pool_arc = Arc::new(pool);
+
+    // NOTE: start polling
+    if api_config.pollsensors {
+        start_airthings_poll(pool_arc.clone());
+        //start_uhoo_aura_poll();
+        //start_gray_wolf_poll();
+    }
+
+    let app_data = Data::from(pool_arc);
+
     let api_server = HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(pool.clone()))
+            .app_data(app_data.clone())
             .wrap(Logger::default())
             .service(
                 web::scope("/api")
@@ -80,7 +85,6 @@ pub async fn start_server() -> std::io::Result<()> {
                             .service(presentation::user_presentation::airthings_user_patch_handler)
                             .service(presentation::user_presentation::gray_wolf_user_patch_handler)
                             .service(presentation::user_presentation::uhoo_aura_user_patch_handler)
-                            .service(presentation::user_presentation::update_user_information),
                     )
                     .service(
                         web::scope("/fitbit")

@@ -1,4 +1,4 @@
-use crate::infra::collection;
+
 use crate::startup;
 use log::info;
 use mongodb::{options::ClientOptions, Client, Database};

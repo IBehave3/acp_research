@@ -1,4 +1,4 @@
-use crate::model::jwt::{JwtCustomClaims, JwtToken};
+use crate::model::jwt_model::{JwtCustomClaims, JwtToken};
 use jwt_simple::prelude::*;
 use log::info;
 use std::fs::File;

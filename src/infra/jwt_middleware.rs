@@ -9,7 +9,7 @@ use futures_util::future::LocalBoxFuture;
 
 use log::error;
 
-use crate::model::jwt::JwtToken;
+use crate::model::jwt_model::JwtToken;
 
 #[derive(Clone)]
 pub struct Auth;

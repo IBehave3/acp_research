@@ -13,10 +13,10 @@ use startup::on_startup;
 use startup::API_CONFIG;
 
 use crate::infra::airthings_integ::start_airthings_poll;
-//use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
+use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;
-//use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
-use crate::model::jwt::JwtToken;
+use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
+use crate::model::jwt_model::JwtToken;
 use crate::startup::DATABASE_CONFIG;
 
 mod controller;
@@ -60,8 +60,8 @@ pub async fn start_server() -> std::io::Result<()> {
     // NOTE: start polling
     if api_config.pollsensors {
         start_airthings_poll(pool_arc.clone());
-        //start_uhoo_aura_poll();
-        //start_gray_wolf_poll();
+        start_uhoo_aura_poll(pool_arc.clone());
+        start_gray_wolf_poll(pool_arc.clone());
     }
 
     let app_data = Data::from(pool_arc);

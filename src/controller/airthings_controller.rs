@@ -1,12 +1,11 @@
-use diesel_async::{AsyncConnection, AsyncPgConnection, RunQueryDsl};
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use crate::{schema::airthings::dsl::airthings, model::airthings_model::{ClientAirthings, CreateAirthings}};
 
-use crate::{model::airthings_model::{ClientAirthings, CreateAirthings}};
-use crate::schema::airthings::dsl::airthings;
-
-pub async fn create_airthings(connection: &mut AsyncPgConnection, client_airthings: ClientAirthings, user_id: i32) -> anyhow::Result<()> {
+pub async fn create_airthings(connection: &mut AsyncPgConnection, client_airthings: ClientAirthings, user_id: i32, device_id: String) -> anyhow::Result<()> {
     diesel::insert_into(airthings)
     .values(CreateAirthings {
         userid: user_id,
+        deviceid: device_id,
         battery: client_airthings.data.battery,
         co2: client_airthings.data.co2,
         humidity: client_airthings.data.humidity,

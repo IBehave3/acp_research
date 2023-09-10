@@ -1,6 +1,6 @@
-pub mod jwt;
+pub mod jwt_controller;
 pub mod airthings_controller;
-pub mod gray_wolf;
-pub mod uhoo_aura;
-pub mod fitbit;
+pub mod fitbit_controller;
 pub mod user_controller;
+pub mod gray_wolf_controller;
+pub mod uhoo_aura_controller;

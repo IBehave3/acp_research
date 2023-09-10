@@ -8,6 +8,7 @@ use serde::{Serialize, Deserialize};
 pub struct Airthings {
     pub id: i32,
     pub userid: i32,
+    pub deviceid: String,
     pub battery: f64,
     pub co2: f64,
     pub humidity: f64,
@@ -26,6 +27,7 @@ pub struct Airthings {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CreateAirthings {
     pub userid: i32,
+    pub deviceid: String,
     pub battery: f64,
     pub co2: f64,
     pub humidity: f64,
@@ -39,12 +41,12 @@ pub struct CreateAirthings {
     pub relaydevicetype: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ClientAirthings {
     pub data: ClientCoreAirthings
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ClientCoreAirthings {
     pub battery: f64,
     pub co2: f64,

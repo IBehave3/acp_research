@@ -1,21 +1,19 @@
-/*use bson::Document;
-use chrono::Utc;
-use bson::DateTime;
+
+
+
 
 use core::panic;
 use log::{error, info};
-use mongodb::bson;
+
 use reqwest::{Client, Response};
 
-use std::thread;
+use std::{thread, sync::Arc};
 use std::time::Duration;
 
-use crate::{
-    infra::collection::BaseCollection,
-    model::{
-        auth::IdMapping, gray_wolf::GrayWolf,
-    },
-};
+use crate::controller::{user_controller, gray_wolf_controller};
+use crate::model::gray_wolf_model::ClientGrayWolf;
+
+use super::database::DbPool;
 
 const QUERY_FREQ_SECS: u64 = 60;
 
@@ -30,7 +28,7 @@ pub async fn get_device_data(
     Ok(response)
 }
 
-pub fn start_gray_wolf_poll() {
+pub fn start_gray_wolf_poll(pool: Arc<DbPool>) {
     thread::spawn(move || {
         let rt = match tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -44,26 +42,34 @@ pub fn start_gray_wolf_poll() {
         };
 
         loop {
-            let id_mappings = match rt.block_on(IdMapping::get_gray_wolf_users()) {
-                Ok(id_mappings) => id_mappings,
+            let connection = &mut rt.block_on(pool.get()).unwrap();
+
+            let user_gray_wolfs = match rt.block_on(user_controller::get_gray_wolf_users(connection)) {
+                Ok(user_gray_wolfs) => user_gray_wolfs,
                 Err(err) => {
                     error!("{err}");
                     continue;
                 }
             };
 
-            for id_mapping in id_mappings {
-                let gray_wolf = match id_mapping.sensor_auth.gray_wolf {
-                    Some(gray_wolf) => gray_wolf,
+            for user_gray_wolf in user_gray_wolfs {
+                let device_ids = match user_gray_wolf.deviceids {
+                    Some(device_ids) => device_ids,
                     None => {
-                        error!("user {} gray_wolf was null", id_mapping.id);
                         continue;
-                    },
+                    }
                 };
 
-                let api_key = gray_wolf.api_key;
+                let api_key = user_gray_wolf.apikey;
 
-                for device_id in gray_wolf.device_ids {
+                for device_id in device_ids {
+                    let device_id = match device_id {
+                        Some(device_id) => device_id,
+                        None => {
+                            continue;
+                        }
+                    };
+
                     let response = match rt.block_on(get_device_data(&api_key, &device_id)) {
                         Ok(response) => response,
                         Err(err) => {
@@ -73,7 +79,7 @@ pub fn start_gray_wolf_poll() {
                     };
 
                     if response.status() == 200 {
-                        let user_ref_id = id_mapping.id;
+                        let user_ref_id = user_gray_wolf.userid;
                         info!("gray_wolf writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
 
                         let string_json = match rt.block_on(response.text()) {
@@ -92,24 +98,16 @@ pub fn start_gray_wolf_poll() {
                             }
                         };
 
-                        let data: Document = match serde_json::from_str(&string) {
-                            Ok(data) => data,
+                        let client_gray_wolf: ClientGrayWolf = match serde_json::from_str(&string) {
+                            Ok(json) => json,
                             Err(err) => {
                                 error!("{err}");
                                 continue;
                             }
                         };
 
-                        match rt.block_on(GrayWolf::add(GrayWolf {
-                            user_ref_id: id_mapping.id,
-                            created_at: DateTime::from_chrono(Utc::now()),
-                            data,
-                        })) {
-                            Ok(_) => (),
-                            Err(err) => {
-                                error!("{err}");
-                                continue;
-                            }
+                        if let Err(err) = rt.block_on(gray_wolf_controller::create_gray_wolf(connection, client_gray_wolf, user_ref_id, device_id)) {
+                            error!("{err}");
                         }
                     }
                 }
@@ -118,4 +116,4 @@ pub fn start_gray_wolf_poll() {
             thread::sleep(Duration::from_secs(QUERY_FREQ_SECS));
         }
     });
-}*/
+}

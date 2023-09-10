@@ -1,17 +1,17 @@
-/*use bson::DateTime;
 use chrono::Utc;
 use core::panic;
+use std::sync::Arc;
 use log::{error, info};
-use mongodb::{bson, bson::doc};
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use std::thread;
 use std::time::Duration;
 
-use crate::{
-    infra::collection::BaseCollection,
-    model::{auth::IdMapping, uhoo_aura::UhooAura},
-};
+use crate::controller::{user_controller, uhoo_aura_controller};
+use crate::model::uhoo_aura_model::ClientUhooAura;
+use crate::model::user_model::{UserGrayWolf, UserUhooAura};
+
+use super::database::DbPool;
 
 const QUERY_FREQ_SECS: u64 = 60;
 
@@ -58,7 +58,7 @@ pub async fn get_device_data(
     Ok(response)
 }
 
-pub fn start_uhoo_aura_poll() {
+pub fn start_uhoo_aura_poll(pool: Arc<DbPool>) {
     thread::spawn(move || {
         let rt = match tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -72,26 +72,33 @@ pub fn start_uhoo_aura_poll() {
         };
 
         loop {
-            let id_mappings = match rt.block_on(IdMapping::get_uhoo_aura_users()) {
-                Ok(id_mappings) => id_mappings,
+            let connection = &mut rt.block_on(pool.get()).unwrap();
+
+            let user_uhoo_auras: Vec<UserUhooAura> = match rt.block_on(user_controller::get_uhoo_aura_users(connection)) {
+                Ok(users) => users,
                 Err(err) => {
                     error!("{err}");
                     continue;
                 }
             };
 
-            for id_mapping in id_mappings {
-                let uhoo_aura = match id_mapping.sensor_auth.uhoo_aura {
-                    Some(uhoo_aura) => uhoo_aura,
+            for user_uhoo_aura in user_uhoo_auras {
+                let device_ids = match user_uhoo_aura.deviceids {
+                    Some(device_ids) => device_ids,
                     None => {
-                        error!("user {} uhoo_aura was null", id_mapping.id);
                         continue;
-                    },
+                    }
                 };
 
-                let client_secret = uhoo_aura.client_secret;
+                let client_secret = user_uhoo_aura.clientsecret;
 
-                for device_id in uhoo_aura.device_ids {
+                for device_id in device_ids {
+                    let device_id = match device_id {
+                        Some(device_id) => device_id,
+                        None => {
+                            continue;
+                        }
+                    };
                     let token = match rt.block_on(get_token(&client_secret)) {
                         Ok(token) => token,
                         Err(err) => {
@@ -109,7 +116,7 @@ pub fn start_uhoo_aura_poll() {
                         };
 
                     if response.status() == 200 {
-                        let user_ref_id = id_mapping.id;
+                        let user_ref_id = user_uhoo_aura.userid;
                         info!("uhoo_aura writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
 
                         let bytes = match rt.block_on(response.bytes()) {
@@ -119,7 +126,7 @@ pub fn start_uhoo_aura_poll() {
                                 continue;
                             }
                         };
-                        let data = match serde_json::from_slice(&bytes[..]) {
+                        let client_uhoo_aura: ClientUhooAura = match serde_json::from_slice(&bytes[..]) {
                             Ok(data) => data,
                             Err(err) => {
                                 error!("{err}");
@@ -127,16 +134,8 @@ pub fn start_uhoo_aura_poll() {
                             }
                         };
 
-                        match rt.block_on(UhooAura::add(UhooAura {
-                            user_ref_id: id_mapping.id,
-                            created_at: DateTime::from_chrono(Utc::now()),
-                            data,
-                        })) {
-                            Ok(_) => (),
-                            Err(err) => {
-                                error!("{err}");
-                                continue;
-                            }
+                        if let Err(err) = rt.block_on(uhoo_aura_controller::create_uhoo_aura(connection, client_uhoo_aura, user_ref_id, device_id)) {
+                            error!("uhoo_aura db error {err}");
                         }
                     }
                 }
@@ -145,4 +144,4 @@ pub fn start_uhoo_aura_poll() {
             thread::sleep(Duration::from_secs(QUERY_FREQ_SECS));
         }
     });
-}*/
+}

@@ -39,7 +39,7 @@ pub struct UserAirthings {
 )]
 #[diesel(belongs_to(User, foreign_key = userid))]
 #[diesel(table_name = crate::schema::user_gray_wolfs)]
-pub struct UserGrayWolfs {
+pub struct UserGrayWolf {
     pub id: i32,
     pub userid: i32,
     pub apikey: String,
@@ -51,7 +51,7 @@ pub struct UserGrayWolfs {
 )]
 #[diesel(belongs_to(User, foreign_key = userid))]
 #[diesel(table_name = crate::schema::user_uhoo_auras)]
-pub struct UserUhooAuras {
+pub struct UserUhooAura {
     pub id: i32,
     pub userid: i32,
     pub clientsecret: String,
@@ -104,8 +104,8 @@ pub struct ClientGetUserInformation {
     #[serde(flatten)]
     pub user: User,
     pub airthings: Option<UserAirthings>,
-    pub gray_wolf: Option<UserGrayWolfs>,
-    pub uhoo_aura: Option<UserUhooAuras>
+    pub gray_wolf: Option<UserGrayWolf>,
+    pub uhoo_aura: Option<UserUhooAura>
 }
 
 // NOTE: insert types -------------------------------

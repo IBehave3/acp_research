@@ -1,6 +1,3 @@
-use bson::{DateTime, Document};
-use chrono::Utc;
-use diesel_async::AsyncPgConnection;
 use log::{error, info};
 use oauth2::basic::{BasicClient, BasicTokenType};
 use oauth2::reqwest::async_http_client;
@@ -13,8 +10,8 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
+
 use crate::controller::{user_controller, airthings_controller};
-use crate::infra::collection::BaseCollection;
 use crate::model::airthings_model::ClientAirthings;
 
 use super::database::DbPool;
@@ -79,9 +76,9 @@ pub fn start_airthings_poll(pool: Arc<DbPool>) {
             }
         };
 
-        let connection = &mut rt.block_on(pool.get()).unwrap();
-
         loop {
+            let connection = &mut rt.block_on(pool.get()).unwrap();
+
             let user_airthings: Vec<crate::model::user_model::UserAirthings> = match rt.block_on(user_controller::get_airthings_users(connection)) {
                 Ok(users) => users,
                 Err(err) => {
@@ -125,8 +122,6 @@ pub fn start_airthings_poll(pool: Arc<DbPool>) {
                         }
                     };
 
-                    println!("{}", response.status());
-
                     if response.status() == 200 {
                         let user_ref_id = user_airthing.userid;
                         info!("airthings writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
@@ -138,7 +133,7 @@ pub fn start_airthings_poll(pool: Arc<DbPool>) {
                                 continue;
                             }
                         };
-                        let data: ClientAirthings  = match serde_json::from_slice(&bytes[..]) {
+                        let client_airthings: ClientAirthings  = match serde_json::from_slice(&bytes[..]) {
                             Ok(data) => data,
                             Err(err) => {
                                 error!("serde_json {err}");
@@ -146,7 +141,7 @@ pub fn start_airthings_poll(pool: Arc<DbPool>) {
                             }
                         };
 
-                        if let Err(err) = rt.block_on(airthings_controller::create_airthings(connection, data, user_ref_id)) {
+                        if let Err(err) = rt.block_on(airthings_controller::create_airthings(connection, client_airthings, user_ref_id, device_id)) {
                             error!("create_airthings {err}");
                         }
                     }

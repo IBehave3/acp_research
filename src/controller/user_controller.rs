@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpResponse, Responder};
 use bcrypt::hash_with_result;
-use log::{error, info};
+use log::{error};
 
 use diesel::result::{DatabaseErrorKind, Error as diesel_error};
 use diesel::{self, ExpressionMethods, QueryDsl, SelectableHelper};
@@ -12,13 +12,13 @@ use crate::infra::api_error;
 use crate::infra::api_error::ApiError;
 use crate::infra::database::DbPool;
 use crate::infra::jwt_middleware::AuthenticatedClaims;
-use crate::model::airthings_model::Airthings;
-use crate::model::jwt::{JwtCustomClaims, JwtToken};
+
+use crate::model::jwt_model::{JwtCustomClaims, JwtToken};
 use crate::model::user_model::{
     ClientCreateUser, ClientGetUserInformation, ClientLoginUser, ClientUpdateUserAirthings,
     ClientUpdateUserGrayWolf, ClientUpdateUserUhooAura, CreateUser, CreateUserAirthings,
     CreateUserGrayWolf, CreateUserUhooAura, UpdateUserAirthings, UpdateUserGrayWolf,
-    UpdateUserUhooAura, User, UserAirthings, UserGrayWolfs, UserUhooAuras,
+    UpdateUserUhooAura, User, UserAirthings, UserGrayWolf, UserUhooAura,
 };
 use crate::schema::user_airthings::dsl::user_airthings;
 use crate::schema::user_airthings::{self as user_airthings_fields};
@@ -43,8 +43,8 @@ pub async fn get_user(
     let user_information: (
         User,
         Option<UserAirthings>,
-        Option<UserGrayWolfs>,
-        Option<UserUhooAuras>,
+        Option<UserGrayWolf>,
+        Option<UserUhooAura>,
     ) = users_fields::table
         .find(authenticated_claims.user_id)
         .left_join(user_airthings_fields::table)
@@ -53,14 +53,14 @@ pub async fn get_user(
         .select((
             User::as_select(),
             Option::<UserAirthings>::as_select(),
-            Option::<UserGrayWolfs>::as_select(),
-            Option::<UserUhooAuras>::as_select(),
+            Option::<UserGrayWolf>::as_select(),
+            Option::<UserUhooAura>::as_select(),
         ))
         .first::<(
             User,
             Option<UserAirthings>,
-            Option<UserGrayWolfs>,
-            Option<UserUhooAuras>,
+            Option<UserGrayWolf>,
+            Option<UserUhooAura>,
         )>(database_connection)
         .await
         .unwrap();
@@ -88,13 +88,13 @@ pub async fn create_user(
         .map_err(|_| ApiError::HashCreationError)?;
 
     let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
-    let blog_id = match diesel::insert_into(users)
+    let user: User  = match diesel::insert_into(users)
         .values(CreateUser {
             username: client_create_user.username,
             passwordhash: hash.to_string(),
             salt: hash.get_salt(),
         })
-        .execute(database_connection)
+        .get_result(database_connection)
         .await
     {
         Ok(blog_id) => blog_id,
@@ -112,7 +112,13 @@ pub async fn create_user(
         }
     };
 
-    Ok(HttpResponse::Created().body(blog_id.to_string()))
+    let jwt_token = JwtToken::new(JwtCustomClaims {
+        user_id: user.id,
+        username: user.username,
+    })
+    .map_err(|_| ApiError::TokenCreationError)?;
+
+    Ok(HttpResponse::Created().json(jwt_token))
 }
 
 pub async fn login_user(
@@ -289,11 +295,28 @@ pub async fn update_user_uhoo_aura(
 }
 
 pub async fn get_airthings_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserAirthings>> {
-    info!("HERE");
     let airthings_users: Vec<UserAirthings> = user_airthings
         .select(UserAirthings::as_select())
         .load(connection)
         .await?;
 
     Ok(airthings_users)
+}
+
+pub async fn get_gray_wolf_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserGrayWolf>> {
+    let gray_wolf_users: Vec<UserGrayWolf> = user_gray_wolfs
+        .select(UserGrayWolf::as_select())
+        .load(connection)
+        .await?;
+
+    Ok(gray_wolf_users)
+}
+
+pub async fn get_uhoo_aura_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserUhooAura>> {
+    let uhoo_aura_users: Vec<UserUhooAura> = user_uhoo_auras
+        .select(UserUhooAura::as_select())
+        .load(connection)
+        .await?;
+
+    Ok(uhoo_aura_users)
 }

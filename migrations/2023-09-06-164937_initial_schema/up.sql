@@ -4,7 +4,35 @@ CREATE TABLE users (
     createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     username VARCHAR NOT NULL UNIQUE,
     passwordHash VARCHAR NOT NULL,
-    salt VARCHAR NOT NULL
+    salt VARCHAR NOT NULL,
+
+    race TEXT[],
+    otherRace VARCHAR,
+    gender VARCHAR,
+    otherGender VARCHAR,
+    employed BOOLEAN NOT NULL,
+
+    -- How often have you felt that you were unable to control the important things in your life
+    unableToControlImportantThings INT NOT NULL,
+    -- How often have you felt confident about your ability to handle your personal problems
+    oftenFeltConfidentHandlePersonalProblems INT NOT NULL,
+    -- How often have you felt that things were going your way
+    feltThingsGoYourWay INT NOT NULL,
+    -- How often have you felt difficulties were piling up so high that you could not overcome them?
+    feltDifficultiesPilingUp INT NOT NULL,
+
+    -- I tend to bounce back quickly after hard times 
+    bounceBackQuickly INT NOT NULL,
+    -- I have a hard time making it through stressfull events
+    hardTimeStressfullEvents INT NOT NULL,
+    -- It does not take me long to recover from a stressfull event
+    longRecoveryTime INT NOT NULL,
+    -- It is hard for me to snap back when something bad happens
+    hardToSnapBack INT NOT NULL,
+    -- I usually come through difficult times with little trouble
+    comeThroughDifficultTimes INT NOT NULL,
+    -- I tend to take a long time to get over a set-backs in life
+    longTimeGetOverSetBacks INT NOT NULL
 );
 
 CREATE TABLE user_airthings (
@@ -128,4 +156,46 @@ CREATE TABLE uhoo_auras (
     oxygenUnit VARCHAR NOT NULL,
 
     UNIQUE(deviceid, timestamp)
+);
+
+CREATE TABLE fitbit_heartrates (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    timestamp TIMESTAMPTZ NOT NULL,
+    heartrate INT NOT NULL
+);
+
+CREATE TABLE fitbit_accelerometers (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    timestamp TIMESTAMPTZ NOT NULL,
+    x DOUBLE PRECISION NOT NULL,
+    y DOUBLE PRECISION NOT NULL,
+    z DOUBLE PRECISION NOT NULL
+);
+
+CREATE TABLE fitbit_barometers (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    timestamp TIMESTAMPTZ NOT NULL,
+    pressure INT NOT NULL
+);
+
+CREATE TABLE fitbit_gyroscopes (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    timestamp TIMESTAMPTZ NOT NULL,
+    x DOUBLE PRECISION NOT NULL,
+    y DOUBLE PRECISION NOT NULL,
+    z DOUBLE PRECISION NOT NULL
+);
+
+CREATE TABLE fitbit_orientations (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    timestamp TIMESTAMPTZ NOT NULL,
+    x DOUBLE PRECISION NOT NULL,
+    y DOUBLE PRECISION NOT NULL,
+    z DOUBLE PRECISION NOT NULL,
+    scalar DOUBLE PRECISION NOT NULL
 );

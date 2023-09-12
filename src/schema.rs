@@ -20,6 +20,58 @@ diesel::table! {
 }
 
 diesel::table! {
+    fitbit_accelerometers (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Timestamptz,
+        x -> Float8,
+        y -> Float8,
+        z -> Float8,
+    }
+}
+
+diesel::table! {
+    fitbit_barometers (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Timestamptz,
+        pressure -> Int4,
+    }
+}
+
+diesel::table! {
+    fitbit_gyroscopes (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Timestamptz,
+        x -> Float8,
+        y -> Float8,
+        z -> Float8,
+    }
+}
+
+diesel::table! {
+    fitbit_heartrates (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Timestamptz,
+        heartrate -> Int4,
+    }
+}
+
+diesel::table! {
+    fitbit_orientations (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Timestamptz,
+        x -> Float8,
+        y -> Float8,
+        z -> Float8,
+        scalar -> Float8,
+    }
+}
+
+diesel::table! {
     gray_wolf_sensors (id) {
         id -> Int4,
         graywolfsid -> Int4,
@@ -135,10 +187,30 @@ diesel::table! {
         username -> Varchar,
         passwordhash -> Varchar,
         salt -> Varchar,
+        race -> Nullable<Array<Nullable<Text>>>,
+        otherrace -> Nullable<Varchar>,
+        gender -> Nullable<Varchar>,
+        othergender -> Nullable<Varchar>,
+        employed -> Bool,
+        unabletocontrolimportantthings -> Int4,
+        oftenfeltconfidenthandlepersonalproblems -> Int4,
+        feltthingsgoyourway -> Int4,
+        feltdifficultiespilingup -> Int4,
+        bouncebackquickly -> Int4,
+        hardtimestressfullevents -> Int4,
+        longrecoverytime -> Int4,
+        hardtosnapback -> Int4,
+        comethroughdifficulttimes -> Int4,
+        longtimegetoversetbacks -> Int4,
     }
 }
 
 diesel::joinable!(airthings -> users (userid));
+diesel::joinable!(fitbit_accelerometers -> users (userid));
+diesel::joinable!(fitbit_barometers -> users (userid));
+diesel::joinable!(fitbit_gyroscopes -> users (userid));
+diesel::joinable!(fitbit_heartrates -> users (userid));
+diesel::joinable!(fitbit_orientations -> users (userid));
 diesel::joinable!(gray_wolf_sensors -> gray_wolfs (graywolfsid));
 diesel::joinable!(gray_wolfs -> users (userid));
 diesel::joinable!(uhoo_auras -> users (userid));
@@ -148,6 +220,11 @@ diesel::joinable!(user_uhoo_auras -> users (userid));
 
 diesel::allow_tables_to_appear_in_same_query!(
     airthings,
+    fitbit_accelerometers,
+    fitbit_barometers,
+    fitbit_gyroscopes,
+    fitbit_heartrates,
+    fitbit_orientations,
     gray_wolf_sensors,
     gray_wolfs,
     uhoo_auras,

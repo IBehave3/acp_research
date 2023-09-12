@@ -93,6 +93,24 @@ pub async fn create_user(
             username: client_create_user.username,
             passwordhash: hash.to_string(),
             salt: hash.get_salt(),
+
+            race: client_create_user.demographic.race,
+            otherrace: client_create_user.demographic.other_race,
+            gender: client_create_user.demographic.gender,
+            othergender: client_create_user.demographic.other_gender,
+            employed: client_create_user.demographic.employed,
+
+            unabletocontrolimportantthings: client_create_user.stress.unable_to_control_important_things,
+            oftenfeltconfidenthandlepersonalproblems: client_create_user.stress.often_felt_confident_handle_personal_problems,
+            feltthingsgoyourway: client_create_user.stress.felt_things_go_your_way,
+            feltdifficultiespilingup: client_create_user.stress.felt_difficulties_piling_up,
+
+            bouncebackquickly: client_create_user.resilience.bounce_back_quickly,
+            hardtimestressfullevents: client_create_user.resilience.hard_time_stressfull_events,
+            longrecoverytime: client_create_user.resilience.long_recovery_time,
+            hardtosnapback: client_create_user.resilience.hard_to_snap_back,
+            comethroughdifficulttimes: client_create_user.resilience.come_through_difficult_times,
+            longtimegetoversetbacks: client_create_user.resilience.long_recovery_time,
         })
         .get_result(database_connection)
         .await

@@ -18,6 +18,24 @@ pub struct User {
     pub username: String,
     pub passwordhash: String,
     pub salt: String,
+
+    pub race: Option<Vec<Option<String>>>,
+    pub otherrace: Option<String>,
+    pub gender: Option<String>,
+    pub othergender: Option<String>,
+    pub employed: bool,
+
+    pub unabletocontrolimportantthings: i32,
+    pub oftenfeltconfidenthandlepersonalproblems: i32,
+    pub feltthingsgoyourway: i32,
+    pub feltdifficultiespilingup: i32,
+
+    pub bouncebackquickly: i32,
+    pub hardtimestressfullevents: i32,
+    pub longrecoverytime: i32,
+    pub hardtosnapback: i32,
+    pub comethroughdifficulttimes: i32,
+    pub longtimegetoversetbacks: i32
 }
 
 #[derive(
@@ -69,6 +87,48 @@ pub struct ClientLoginUser {
 pub struct ClientCreateUser {
     pub username: String,
     pub password: String,
+    pub resilience: ClientCreateUserResilience,
+    pub demographic: ClientCreateUserDemographic,
+    pub stress: ClientCreateUserStress,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ClientCreateUserResilience {
+    #[serde(rename = "bounceBackQuickly")]
+    pub bounce_back_quickly: i32,
+    #[serde(rename = "hardTimeStressfullEvents")]
+    pub hard_time_stressfull_events: i32,
+    #[serde(rename = "longRecoveryTime")]
+    pub long_recovery_time: i32,
+    #[serde(rename = "hardToSnapBack")]
+    pub hard_to_snap_back: i32,
+    #[serde(rename = "comeThroughDifficulTimes")]
+    pub come_through_difficult_times: i32,
+    #[serde(rename = "longTimeGetOverSetBacks")]
+    pub long_time_get_over_set_backs: i32
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ClientCreateUserDemographic {
+    pub race: Option<Vec<Option<String>>>,
+    #[serde(rename = "otherRace")]
+    pub other_race: Option<String>,
+    pub gender: Option<String>,
+    #[serde(rename = "otherGender")]
+    pub other_gender: Option<String>,
+    pub employed: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ClientCreateUserStress {
+    #[serde(rename = "unableToControlImportanThings")]
+    pub unable_to_control_important_things: i32,
+    #[serde(rename = "oftenFeltConfidentHandlePersonalProblems")]
+    pub often_felt_confident_handle_personal_problems: i32,
+    #[serde(rename = "feltThingsGoYourWay")]
+    pub felt_things_go_your_way: i32,
+    #[serde(rename = "feltDifficultiesPilingUp")]
+    pub felt_difficulties_piling_up: i32,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -115,6 +175,24 @@ pub struct CreateUser {
     pub username: String,
     pub passwordhash: String,
     pub salt: String,
+
+    pub race: Option<Vec<Option<String>>>,
+    pub otherrace: Option<String>,
+    pub gender: Option<String>,
+    pub othergender: Option<String>,
+    pub employed: bool,
+
+    pub unabletocontrolimportantthings: i32,
+    pub oftenfeltconfidenthandlepersonalproblems: i32,
+    pub feltthingsgoyourway: i32,
+    pub feltdifficultiespilingup: i32,
+
+    pub bouncebackquickly: i32,
+    pub hardtimestressfullevents: i32,
+    pub longrecoverytime: i32,
+    pub hardtosnapback: i32,
+    pub comethroughdifficulttimes: i32,
+    pub longtimegetoversetbacks: i32
 }
 
 #[derive(Insertable, Serialize, Deserialize)]

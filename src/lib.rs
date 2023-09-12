@@ -72,7 +72,7 @@ pub async fn start_server() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(
                 web::scope("/api")
-                    .service(presentation::test::test_get_handler)
+                    .service(presentation::test_presentation::test_get_handler)
                     .service(
                         web::scope("/auth-init")
                             .service(presentation::user_presentation::create_user_post_handler)
@@ -89,7 +89,7 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(
                         web::scope("/fitbit")
                             .wrap(jwt_middleware::Auth)
-                            .service(presentation::fitbit::create_fitbit_post_handler),
+                            .service(presentation::fitbit_presentation::create_fitbit_post_handler),
                     ),
             )
     })

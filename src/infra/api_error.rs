@@ -19,7 +19,7 @@ pub enum ApiError {
     TokenValidationError,
     InvalidPasswordError,
     InvalidUsernameError,
-    UserNotFoundError,
+    UserNotFoundError
 }
 
 impl error::ResponseError<> for ApiError {

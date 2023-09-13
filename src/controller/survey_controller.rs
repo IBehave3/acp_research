@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use actix_web::{HttpResponse, Responder};
-use diesel_async::{RunQueryDsl};
+use diesel_async::RunQueryDsl;
 use log::error;
 
 use crate::infra::api_error::ApiError;

@@ -96,6 +96,11 @@ pub async fn start_server() -> std::io::Result<()> {
                             .wrap(jwt_middleware::Auth)
                             .service(presentation::survey_presentation::create_hourly_survey_post_presentation)
                             .service(presentation::survey_presentation::create_daily_survey_post_presentation),
+                    )
+                    .service(
+                        web::scope("/location")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::gis_location_presentation::create_gis_location_post_presentation)
                     ),
             )
     })

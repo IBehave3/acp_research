@@ -1,12 +1,10 @@
 use crate::{
-    controller::{user_controller},
+    controller::user_controller,
     infra::{database::DbPool, jwt_middleware::AuthenticatedClaims},
-    model::{
-        user_model::{
+    model::user_model::{
             ClientCreateUser, ClientLoginUser, ClientUpdateUserAirthings, ClientUpdateUserGrayWolf,
             ClientUpdateUserUhooAura,
         },
-    },
 };
 use actix_web::{
     get, patch, post,

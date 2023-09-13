@@ -1,4 +1,3 @@
-
 use diesel::prelude::Insertable;
 use serde::{Deserialize, Serialize};
 

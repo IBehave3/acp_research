@@ -1,7 +1,3 @@
-
-
-
-
 use core::panic;
 use log::{error, info};
 

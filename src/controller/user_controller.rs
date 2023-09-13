@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpResponse, Responder};
 use bcrypt::hash_with_result;
-use log::{error};
+use log::error;
 
 use diesel::result::{DatabaseErrorKind, Error as diesel_error};
 use diesel::{self, ExpressionMethods, QueryDsl, SelectableHelper};

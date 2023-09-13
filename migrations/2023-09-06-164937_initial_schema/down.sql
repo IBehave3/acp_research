@@ -1,4 +1,7 @@
 -- This file should undo anything in `up.sql`
+DROP TABLE gis_locations;
+DROP TABLE daily_survey;
+DROP TABLE hourly_surveys;
 DROP TABLE fitbit_heartrates;
 DROP TABLE fitbit_accelerometers;
 DROP TABLE fitbit_barometers;

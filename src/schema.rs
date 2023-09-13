@@ -20,6 +20,22 @@ diesel::table! {
 }
 
 diesel::table! {
+    daily_surveys (id) {
+        id -> Int4,
+        userid -> Int4,
+        createdat -> Timestamptz,
+        unabletocontrolimportantthings -> Int4,
+        oftenfeltconfidenthandlepersonalproblems -> Int4,
+        feelthingsaregoingmyway -> Int4,
+        feeldifficultiespilingcannotovercome -> Int4,
+        stressyourhealth -> Int4,
+        stressyourfinances -> Int4,
+        stressfamilysocialrelationships -> Int4,
+        stressyourword -> Int4,
+    }
+}
+
+diesel::table! {
     fitbit_accelerometers (id) {
         id -> Int4,
         userid -> Int4,
@@ -72,6 +88,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    gis_locations (id) {
+        id -> Int4,
+        userid -> Int4,
+        createdat -> Timestamptz,
+        timestamp -> Timestamptz,
+        latitude -> Float8,
+        longitude -> Float8,
+    }
+}
+
+diesel::table! {
     gray_wolf_sensors (id) {
         id -> Int4,
         graywolfsid -> Int4,
@@ -96,6 +123,17 @@ diesel::table! {
         status -> Varchar,
         serialnumber -> Varchar,
         timestamp -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    hourly_surveys (id) {
+        id -> Int4,
+        userid -> Int4,
+        createdat -> Timestamptz,
+        thermalsensation -> Int4,
+        thermalacceptability -> Int4,
+        thermalcomfort -> Int4,
     }
 }
 
@@ -206,13 +244,16 @@ diesel::table! {
 }
 
 diesel::joinable!(airthings -> users (userid));
+diesel::joinable!(daily_surveys -> users (userid));
 diesel::joinable!(fitbit_accelerometers -> users (userid));
 diesel::joinable!(fitbit_barometers -> users (userid));
 diesel::joinable!(fitbit_gyroscopes -> users (userid));
 diesel::joinable!(fitbit_heartrates -> users (userid));
 diesel::joinable!(fitbit_orientations -> users (userid));
+diesel::joinable!(gis_locations -> users (userid));
 diesel::joinable!(gray_wolf_sensors -> gray_wolfs (graywolfsid));
 diesel::joinable!(gray_wolfs -> users (userid));
+diesel::joinable!(hourly_surveys -> users (userid));
 diesel::joinable!(uhoo_auras -> users (userid));
 diesel::joinable!(user_airthings -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
@@ -220,13 +261,16 @@ diesel::joinable!(user_uhoo_auras -> users (userid));
 
 diesel::allow_tables_to_appear_in_same_query!(
     airthings,
+    daily_surveys,
     fitbit_accelerometers,
     fitbit_barometers,
     fitbit_gyroscopes,
     fitbit_heartrates,
     fitbit_orientations,
+    gis_locations,
     gray_wolf_sensors,
     gray_wolfs,
+    hourly_surveys,
     uhoo_auras,
     user_airthings,
     user_gray_wolfs,

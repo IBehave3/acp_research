@@ -1,6 +1,3 @@
-
-
-
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 

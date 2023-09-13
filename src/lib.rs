@@ -90,6 +90,12 @@ pub async fn start_server() -> std::io::Result<()> {
                         web::scope("/fitbit")
                             .wrap(jwt_middleware::Auth)
                             .service(presentation::fitbit_presentation::create_fitbit_post_handler),
+                    )
+                    .service(
+                        web::scope("/survey")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::survey_presentation::create_hourly_survey_post_presentation)
+                            .service(presentation::survey_presentation::create_daily_survey_post_presentation),
                     ),
             )
     })

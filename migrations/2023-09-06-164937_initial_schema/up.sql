@@ -162,7 +162,9 @@ CREATE TABLE fitbit_heartrates (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     timestamp TIMESTAMPTZ NOT NULL,
-    heartrate INT NOT NULL
+    heartrate INT NOT NULL,
+
+    UNIQUE(userId, timestamp)
 );
 
 CREATE TABLE fitbit_accelerometers (
@@ -171,14 +173,18 @@ CREATE TABLE fitbit_accelerometers (
     timestamp TIMESTAMPTZ NOT NULL,
     x DOUBLE PRECISION NOT NULL,
     y DOUBLE PRECISION NOT NULL,
-    z DOUBLE PRECISION NOT NULL
+    z DOUBLE PRECISION NOT NULL,
+
+    UNIQUE(userId, timestamp)
 );
 
 CREATE TABLE fitbit_barometers (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     timestamp TIMESTAMPTZ NOT NULL,
-    pressure INT NOT NULL
+    pressure INT NOT NULL,
+
+    UNIQUE(userId, timestamp)
 );
 
 CREATE TABLE fitbit_gyroscopes (
@@ -187,7 +193,9 @@ CREATE TABLE fitbit_gyroscopes (
     timestamp TIMESTAMPTZ NOT NULL,
     x DOUBLE PRECISION NOT NULL,
     y DOUBLE PRECISION NOT NULL,
-    z DOUBLE PRECISION NOT NULL
+    z DOUBLE PRECISION NOT NULL,
+
+    UNIQUE(userId, timestamp)
 );
 
 CREATE TABLE fitbit_orientations (
@@ -197,5 +205,50 @@ CREATE TABLE fitbit_orientations (
     x DOUBLE PRECISION NOT NULL,
     y DOUBLE PRECISION NOT NULL,
     z DOUBLE PRECISION NOT NULL,
-    scalar DOUBLE PRECISION NOT NULL
+    scalar DOUBLE PRECISION NOT NULL,
+
+    UNIQUE(userId, timestamp)
+);
+
+CREATE TABLE gis_locations (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    timestamp TIMESTAMPTZ NOT NULL,
+
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+
+    UNIQUE(userId, timestamp)
+);
+
+CREATE TABLE daily_surveys (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- How often have you felt that you were unable to control the important things in your life? 
+    unableToControlImportantThings INT NOT NULL,
+    -- How often have you felt confident about your ability to handle your personal problems? 
+    oftenFeltConfidentHandlePersonalProblems INT NOT NULL,
+    -- How often have you felt that things were going your way? 
+    feelThingsAreGoingMyWay INT NOT NULL,
+    -- How often have you felt difficulties were piling up so high that you could not overcome them? 
+    feelDifficultiesPilingCannotOvercome INT NOT NULL,
+
+    -- To what extent are you currently experiencing stress with regard to the following topics
+    stressYourHealth INT NOT NULL,
+    stressYourFinances INT NOT NULL,
+    stressFamilySocialRelationships INT NOT NULL,
+    stressYourWord INT NOT NULL
+);
+
+CREATE TABLE hourly_surveys (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    thermalSensation INT NOT NULL,
+    thermalAcceptability INT NOT NULL,
+    thermalComfort INT NOT NULL
 );

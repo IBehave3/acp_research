@@ -1,4 +1,4 @@
-use chrono::Utc;
+
 use core::panic;
 use std::sync::Arc;
 use log::{error, info};
@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use crate::controller::{user_controller, uhoo_aura_controller};
 use crate::model::uhoo_aura_model::ClientUhooAura;
-use crate::model::user_model::{UserGrayWolf, UserUhooAura};
+use crate::model::user_model::{UserUhooAura};
 
 use super::database::DbPool;
 

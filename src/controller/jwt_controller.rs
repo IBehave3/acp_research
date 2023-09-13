@@ -19,11 +19,7 @@ impl JwtToken {
             info!("jwt private key found");
             let mut file = File::open(jwt_private_key_file_path.to_str().unwrap()).unwrap();
             let mut buffer = Vec::new();
-            let file_size = file.read_to_end(&mut buffer).unwrap();
-
-            if file_size <= 0 {
-                panic!("jwt private key file size was {}", file_size);
-            }
+            let _file_size = file.read_to_end(&mut buffer).unwrap();
 
             key = HS256Key::from_bytes(&buffer);
         } else {

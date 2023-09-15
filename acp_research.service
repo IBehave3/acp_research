@@ -4,7 +4,7 @@ Description=API for acp-research.com
 [Service]
 User=root
 WorkingDirectory=/home/theassembler1/src/acp_research
-ExecStart=/home/theassembler1/src/acp_research/target/release/acp_research
+ExecStart=/home/theassembler1/src/acp_research/prod/acp_research
 Restart=always
 
 [Install]

@@ -19,11 +19,13 @@ pub struct User {
     pub passwordhash: String,
     pub salt: String,
 
+    pub age: i32,
     pub race: Option<Vec<Option<String>>>,
     pub otherrace: Option<String>,
     pub gender: Option<String>,
     pub othergender: Option<String>,
     pub employed: bool,
+    pub levelofeducation: String,
 
     pub unabletocontrolimportantthings: i32,
     pub oftenfeltconfidenthandlepersonalproblems: i32,
@@ -35,7 +37,7 @@ pub struct User {
     pub longrecoverytime: i32,
     pub hardtosnapback: i32,
     pub comethroughdifficulttimes: i32,
-    pub longtimegetoversetbacks: i32
+    pub longtimegetoversetbacks: i32,
 }
 
 #[derive(
@@ -105,11 +107,12 @@ pub struct ClientCreateUserResilience {
     #[serde(rename = "comeThroughDifficulTimes")]
     pub come_through_difficult_times: i32,
     #[serde(rename = "longTimeGetOverSetBacks")]
-    pub long_time_get_over_set_backs: i32
+    pub long_time_get_over_set_backs: i32,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ClientCreateUserDemographic {
+    pub age: i32,
     pub race: Option<Vec<Option<String>>>,
     #[serde(rename = "otherRace")]
     pub other_race: Option<String>,
@@ -117,6 +120,8 @@ pub struct ClientCreateUserDemographic {
     #[serde(rename = "otherGender")]
     pub other_gender: Option<String>,
     pub employed: bool,
+    #[serde(rename = "levelOfEducation")]
+    pub level_of_education: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -156,7 +161,7 @@ pub struct ClientUpdateUserUhooAura {
     #[serde(rename = "clientSecret")]
     pub client_secret: String,
     #[serde(rename = "deviceIds")]
-    pub device_ids: HashSet<String>, 
+    pub device_ids: HashSet<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -165,7 +170,7 @@ pub struct ClientGetUserInformation {
     pub user: User,
     pub airthings: Option<UserAirthings>,
     pub gray_wolf: Option<UserGrayWolf>,
-    pub uhoo_aura: Option<UserUhooAura>
+    pub uhoo_aura: Option<UserUhooAura>,
 }
 
 // NOTE: insert types -------------------------------
@@ -176,11 +181,13 @@ pub struct CreateUser {
     pub passwordhash: String,
     pub salt: String,
 
+    pub age: i32,
     pub race: Option<Vec<Option<String>>>,
     pub otherrace: Option<String>,
     pub gender: Option<String>,
     pub othergender: Option<String>,
     pub employed: bool,
+    pub levelofeducation: String,
 
     pub unabletocontrolimportantthings: i32,
     pub oftenfeltconfidenthandlepersonalproblems: i32,
@@ -192,7 +199,7 @@ pub struct CreateUser {
     pub longrecoverytime: i32,
     pub hardtosnapback: i32,
     pub comethroughdifficulttimes: i32,
-    pub longtimegetoversetbacks: i32
+    pub longtimegetoversetbacks: i32,
 }
 
 #[derive(Insertable, Serialize, Deserialize)]

@@ -7,9 +7,7 @@ use serde::{Deserialize, Serialize};
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct CreateHourlySurvey {
     pub userid: i32,
-    pub thermalsensation: i32,
-    pub thermalacceptability: i32,
-    pub thermalcomfort: i32,
+    pub currentstress: i32,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
@@ -31,12 +29,8 @@ pub struct CreateDailySurvey {
 
 #[derive(Serialize, Deserialize)]
 pub struct ClientCreateHourlySurvey {
-    #[serde(rename = "thermalSensation")]
-    pub thermal_sensation: i32,
-    #[serde(rename = "thermalAcceptability")]
-    pub thermal_acceptability: i32,
-    #[serde(rename = "thermalComfort")]
-    pub thermal_comfort: i32,
+    #[serde(rename = "currentStress")]
+    pub current_stress: i32,
 }
 
 #[derive(Serialize, Deserialize)]

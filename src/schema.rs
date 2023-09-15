@@ -131,9 +131,7 @@ diesel::table! {
         id -> Int4,
         userid -> Int4,
         createdat -> Timestamptz,
-        thermalsensation -> Int4,
-        thermalacceptability -> Int4,
-        thermalcomfort -> Int4,
+        currentstress -> Int4,
     }
 }
 
@@ -225,11 +223,13 @@ diesel::table! {
         username -> Varchar,
         passwordhash -> Varchar,
         salt -> Varchar,
+        age -> Int4,
         race -> Nullable<Array<Nullable<Text>>>,
         otherrace -> Nullable<Varchar>,
         gender -> Nullable<Varchar>,
         othergender -> Nullable<Varchar>,
         employed -> Bool,
+        levelofeducation -> Varchar,
         unabletocontrolimportantthings -> Int4,
         oftenfeltconfidenthandlepersonalproblems -> Int4,
         feltthingsgoyourway -> Int4,

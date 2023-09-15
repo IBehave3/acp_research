@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /*
 WITH time_interval AS (
     SELECT NOW() - interval ':y minutes' AS start_time,
@@ -42,23 +44,29 @@ WHERE
     location_id: The unique identifier (ID) of the location record.
     user_id: The ID of the user associated with the location.
     location_timestamp: The timestamp of the location record.
-    distance_in_feet: The calculated distance in feet between the user's 
+    distance_in_feet: The calculated distance in feet between the user's
     location at the given latitude and longitude and the input latitude and longitude.
 
     The query filters the results based on the following conditions:
 
-    It considers only location records within a specified time interval, which is 
+    It considers only location records within a specified time interval, which is
     defined by the :x and :y parameters, relative to the current time.
 
-    It checks if the calculated distance (distance_in_feet) between the user's location 
-    and the input point (:input_latitude and :input_longitude) is greater than the 
+    It checks if the calculated distance (distance_in_feet) between the user's location
+    and the input point (:input_latitude and :input_longitude) is greater than the
     threshold distance specified by the :z parameter.
 
-    It selects the most recent location record within the specified time interval and 
+    It selects the most recent location record within the specified time interval and
     distance threshold for the specified userId.
 
-    The result will include one row for the most recent location record that meets the 
-    criteria for the given userId. This row will contain the location details 
-    (ID, user ID, timestamp, and distance) for that specific location record. If no such 
-    record exists within the specified criteria, the query will return no rows. 
+    The result will include one row for the most recent location record that meets the
+    criteria for the given userId. This row will contain the location details
+    (ID, user ID, timestamp, and distance) for that specific location record. If no such
+    record exists within the specified criteria, the query will return no rows.
 */
+
+#[derive(Serialize, Deserialize)]
+pub struct ClientCreateGisLocation {
+    pub longitude: f64,
+    pub latitude: f64,
+}

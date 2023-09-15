@@ -5,12 +5,14 @@ CREATE TABLE users (
     username VARCHAR NOT NULL UNIQUE,
     passwordHash VARCHAR NOT NULL,
     salt VARCHAR NOT NULL,
-
+  
+    age INT NOT NULL,
     race TEXT[],
     otherRace VARCHAR,
     gender VARCHAR,
     otherGender VARCHAR,
     employed BOOLEAN NOT NULL,
+    levelOfEducation VARCHAR NOT NULL,
 
     -- How often have you felt that you were unable to control the important things in your life
     unableToControlImportantThings INT NOT NULL,
@@ -247,8 +249,6 @@ CREATE TABLE hourly_surveys (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    
-    thermalSensation INT NOT NULL,
-    thermalAcceptability INT NOT NULL,
-    thermalComfort INT NOT NULL
+ 
+    currentStress Int NOT NULL
 );

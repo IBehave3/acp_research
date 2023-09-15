@@ -24,9 +24,7 @@ pub async fn create_hourly_survey(
     diesel::insert_into(hourly_surveys)
         .values(CreateHourlySurvey {
             userid: user_id,
-            thermalsensation: client_hourly_survey.thermal_sensation,
-            thermalacceptability: client_hourly_survey.thermal_acceptability,
-            thermalcomfort: client_hourly_survey.thermal_comfort,
+            currentstress: client_hourly_survey.current_stress,
         })
         .execute(database_connection)
         .await

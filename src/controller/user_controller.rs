@@ -6,7 +6,7 @@ use log::error;
 
 use diesel::result::{DatabaseErrorKind, Error as diesel_error};
 use diesel::{self, ExpressionMethods, QueryDsl, SelectableHelper};
-use diesel_async::{RunQueryDsl, AsyncPgConnection};
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
 use crate::infra::api_error;
 use crate::infra::api_error::ApiError;
@@ -88,20 +88,26 @@ pub async fn create_user(
         .map_err(|_| ApiError::HashCreationError)?;
 
     let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
-    let user: User  = match diesel::insert_into(users)
+    let user: User = match diesel::insert_into(users)
         .values(CreateUser {
             username: client_create_user.username,
             passwordhash: hash.to_string(),
             salt: hash.get_salt(),
 
+            age: client_create_user.demographic.age,
             race: client_create_user.demographic.race,
             otherrace: client_create_user.demographic.other_race,
             gender: client_create_user.demographic.gender,
             othergender: client_create_user.demographic.other_gender,
             employed: client_create_user.demographic.employed,
+            levelofeducation: client_create_user.demographic.level_of_education,
 
-            unabletocontrolimportantthings: client_create_user.stress.unable_to_control_important_things,
-            oftenfeltconfidenthandlepersonalproblems: client_create_user.stress.often_felt_confident_handle_personal_problems,
+            unabletocontrolimportantthings: client_create_user
+                .stress
+                .unable_to_control_important_things,
+            oftenfeltconfidenthandlepersonalproblems: client_create_user
+                .stress
+                .often_felt_confident_handle_personal_problems,
             feltthingsgoyourway: client_create_user.stress.felt_things_go_your_way,
             feltdifficultiespilingup: client_create_user.stress.felt_difficulties_piling_up,
 
@@ -312,7 +318,9 @@ pub async fn update_user_uhoo_aura(
     Ok(HttpResponse::Ok().finish())
 }
 
-pub async fn get_airthings_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserAirthings>> {
+pub async fn get_airthings_users(
+    connection: &mut AsyncPgConnection,
+) -> anyhow::Result<Vec<UserAirthings>> {
     let airthings_users: Vec<UserAirthings> = user_airthings
         .select(UserAirthings::as_select())
         .load(connection)
@@ -321,7 +329,9 @@ pub async fn get_airthings_users(connection: &mut AsyncPgConnection) -> anyhow::
     Ok(airthings_users)
 }
 
-pub async fn get_gray_wolf_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserGrayWolf>> {
+pub async fn get_gray_wolf_users(
+    connection: &mut AsyncPgConnection,
+) -> anyhow::Result<Vec<UserGrayWolf>> {
     let gray_wolf_users: Vec<UserGrayWolf> = user_gray_wolfs
         .select(UserGrayWolf::as_select())
         .load(connection)
@@ -330,7 +340,9 @@ pub async fn get_gray_wolf_users(connection: &mut AsyncPgConnection) -> anyhow::
     Ok(gray_wolf_users)
 }
 
-pub async fn get_uhoo_aura_users(connection: &mut AsyncPgConnection) -> anyhow::Result<Vec<UserUhooAura>> {
+pub async fn get_uhoo_aura_users(
+    connection: &mut AsyncPgConnection,
+) -> anyhow::Result<Vec<UserUhooAura>> {
     let uhoo_aura_users: Vec<UserUhooAura> = user_uhoo_auras
         .select(UserUhooAura::as_select())
         .load(connection)

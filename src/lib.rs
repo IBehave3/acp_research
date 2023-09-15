@@ -2,7 +2,7 @@ use core::panic;
 use std::sync::Arc;
 
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer, web::Data};
+use actix_web::{web, web::Data, App, HttpServer};
 
 use diesel_async::pooled_connection::deadpool::Pool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
@@ -23,8 +23,8 @@ mod controller;
 mod infra;
 mod model;
 mod presentation;
-mod startup;
 mod schema;
+mod startup;
 
 pub async fn start_server() -> std::io::Result<()> {
     env_logger::try_init_from_env(Env::default().default_filter_or("info"))
@@ -42,6 +42,9 @@ pub async fn start_server() -> std::io::Result<()> {
         Some(database_config) => database_config,
         None => panic!("Error DATABASE_CONFIG not initialized"),
     };
+
+    info!("{:#?}", api_config);
+    info!("{:#?}", database_config);
 
     let host = &api_config.host;
     let port = api_config.port;

@@ -70,8 +70,20 @@ pub struct UserGrayWolf {
     Queryable, Selectable, Identifiable, Associations, Serialize, Deserialize, Debug, PartialEq,
 )]
 #[diesel(belongs_to(User, foreign_key = userid))]
-#[diesel(table_name = crate::schema::user_uhoo_auras)]
-pub struct UserUhooAura {
+#[diesel(table_name = crate::schema::user_uhoo_business)]
+pub struct UserUhooBusiness {
+    pub id: i32,
+    pub userid: i32,
+    pub clientsecret: String,
+    pub deviceids: Option<Vec<Option<String>>>,
+}
+
+#[derive(
+    Queryable, Selectable, Identifiable, Associations, Serialize, Deserialize, Debug, PartialEq,
+)]
+#[diesel(belongs_to(User, foreign_key = userid))]
+#[diesel(table_name = crate::schema::user_uhoo_homes)]
+pub struct UserUhooHome {
     pub id: i32,
     pub userid: i32,
     pub clientsecret: String,
@@ -157,7 +169,15 @@ pub struct ClientUpdateUserGrayWolf {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct ClientUpdateUserUhooAura {
+pub struct ClientUpdateUserUhooBusiness {
+    #[serde(rename = "clientSecret")]
+    pub client_secret: String,
+    #[serde(rename = "deviceIds")]
+    pub device_ids: HashSet<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ClientUpdateUserUhooHome {
     #[serde(rename = "clientSecret")]
     pub client_secret: String,
     #[serde(rename = "deviceIds")]
@@ -170,7 +190,8 @@ pub struct ClientGetUserInformation {
     pub user: User,
     pub airthings: Option<UserAirthings>,
     pub gray_wolf: Option<UserGrayWolf>,
-    pub uhoo_aura: Option<UserUhooAura>,
+    pub uhoo_business: Option<UserUhooBusiness>,
+    pub uhoo_home: Option<UserUhooHome>,
 }
 
 // NOTE: insert types -------------------------------
@@ -223,9 +244,18 @@ pub struct CreateUserGrayWolf {
 }
 
 #[derive(Insertable, Serialize, Deserialize)]
-#[diesel(table_name = crate::schema::user_uhoo_auras)]
+#[diesel(table_name = crate::schema::user_uhoo_business)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct CreateUserUhooAura {
+pub struct CreateUserUhooBusiness {
+    pub userid: i32,
+    pub clientsecret: String,
+    pub deviceids: Vec<String>,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_uhoo_homes)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct CreateUserUhooHome {
     pub userid: i32,
     pub clientsecret: String,
     pub deviceids: Vec<String>,
@@ -251,9 +281,18 @@ pub struct UpdateUserGrayWolf {
 }
 
 #[derive(AsChangeset, Serialize, Deserialize)]
-#[diesel(table_name = crate::schema::user_uhoo_auras)]
+#[diesel(table_name = crate::schema::user_uhoo_business)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct UpdateUserUhooAura {
+pub struct UpdateUserUhooBusiness {
     pub clientsecret: String,
     pub deviceids: Vec<String>,
 }
+
+#[derive(AsChangeset, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_uhoo_homes)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct UpdateUserUhooHome {
+    pub clientsecret: String,
+    pub deviceids: Vec<String>,
+}
+

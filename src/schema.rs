@@ -136,7 +136,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    uhoo_auras (id) {
+    uhoo_business (id) {
         id -> Int4,
         userid -> Int4,
         deviceid -> Varchar,
@@ -188,6 +188,48 @@ diesel::table! {
 }
 
 diesel::table! {
+    uhoo_homes (id) {
+        id -> Int4,
+        userid -> Int4,
+        deviceid -> Varchar,
+        virusindex -> Int4,
+        temperature -> Float8,
+        humidity -> Float8,
+        pm25 -> Int4,
+        tvoc -> Int4,
+        co2 -> Int4,
+        co -> Int4,
+        airpressure -> Float8,
+        ozone -> Int4,
+        no2 -> Int4,
+        timestamp -> Int4,
+        temperatureunit -> Varchar,
+        tempunit -> Varchar,
+        humidityunit -> Varchar,
+        pm25unit -> Varchar,
+        dustunit -> Varchar,
+        tvocunit -> Varchar,
+        vocunit -> Varchar,
+        co2unit -> Varchar,
+        counit -> Varchar,
+        airpressureunit -> Varchar,
+        pressureunit -> Varchar,
+        ozoneunit -> Varchar,
+        no2unit -> Varchar,
+        pm1unit -> Varchar,
+        pm4unit -> Varchar,
+        pm10unit -> Varchar,
+        ch2ounit -> Varchar,
+        lightunit -> Varchar,
+        h2sunit -> Varchar,
+        nounit -> Varchar,
+        so2unit -> Varchar,
+        nh3unit -> Varchar,
+        oxygenunit -> Varchar,
+    }
+}
+
+diesel::table! {
     user_airthings (id) {
         id -> Int4,
         userid -> Int4,
@@ -208,7 +250,16 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_uhoo_auras (id) {
+    user_uhoo_business (id) {
+        id -> Int4,
+        userid -> Int4,
+        clientsecret -> Varchar,
+        deviceids -> Nullable<Array<Nullable<Text>>>,
+    }
+}
+
+diesel::table! {
+    user_uhoo_homes (id) {
         id -> Int4,
         userid -> Int4,
         clientsecret -> Varchar,
@@ -254,10 +305,12 @@ diesel::joinable!(gis_locations -> users (userid));
 diesel::joinable!(gray_wolf_sensors -> gray_wolfs (graywolfsid));
 diesel::joinable!(gray_wolfs -> users (userid));
 diesel::joinable!(hourly_surveys -> users (userid));
-diesel::joinable!(uhoo_auras -> users (userid));
+diesel::joinable!(uhoo_business -> users (userid));
+diesel::joinable!(uhoo_homes -> users (userid));
 diesel::joinable!(user_airthings -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
-diesel::joinable!(user_uhoo_auras -> users (userid));
+diesel::joinable!(user_uhoo_business -> users (userid));
+diesel::joinable!(user_uhoo_homes -> users (userid));
 
 diesel::allow_tables_to_appear_in_same_query!(
     airthings,
@@ -271,9 +324,11 @@ diesel::allow_tables_to_appear_in_same_query!(
     gray_wolf_sensors,
     gray_wolfs,
     hourly_surveys,
-    uhoo_auras,
+    uhoo_business,
+    uhoo_homes,
     user_airthings,
     user_gray_wolfs,
-    user_uhoo_auras,
+    user_uhoo_business,
+    user_uhoo_homes,
     users,
 );

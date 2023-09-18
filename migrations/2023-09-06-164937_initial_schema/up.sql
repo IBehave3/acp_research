@@ -55,7 +55,15 @@ CREATE TABLE user_gray_wolfs (
     UNIQUE(userId)
 );
 
-CREATE TABLE user_uhoo_auras (
+CREATE TABLE user_uhoo_business (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    clientSecret VARCHAR NOT NULL,
+    deviceIds TEXT[],
+    UNIQUE(userId)
+);
+
+CREATE TABLE user_uhoo_homes (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     clientSecret VARCHAR NOT NULL,
@@ -108,7 +116,7 @@ CREATE TABLE gray_wolf_sensors (
     status VARCHAR NOT NULL
 );
 
-CREATE TABLE uhoo_auras (
+CREATE TABLE uhoo_business (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     deviceid VARCHAR NOT NULL,
@@ -132,6 +140,48 @@ CREATE TABLE uhoo_auras (
     so2 INT NOT NULL,
     nh3 INT NOT NULL,
     oxygen INT NOT NULL,
+    timestamp INT NOT NULL,
+    temperatureUnit VARCHAR NOT NULL,
+    tempUnit VARCHAR NOT NULL,
+    humidityUnit VARCHAR NOT NULL,
+    pm25Unit VARCHAR NOT NULL,
+    dustUnit VARCHAR NOT NULL,
+    tvocUnit VARCHAR NOT NULL,
+    vocUnit VARCHAR NOT NULL,
+    co2Unit VARCHAR NOT NULL,
+    coUnit VARCHAR NOT NULL,
+    airPressureUnit VARCHAR NOT NULL,
+    pressureUnit VARCHAR NOT NULL,
+    ozoneUnit VARCHAR NOT NULL,
+    no2Unit VARCHAR NOT NULL,
+    pm1Unit VARCHAR NOT NULL,
+    pm4Unit VARCHAR NOT NULL,
+    pm10Unit VARCHAR NOT NULL,
+    ch2oUnit VARCHAR NOT NULL,
+    lightUnit VARCHAR NOT NULL,
+    h2sUnit VARCHAR NOT NULL,
+    noUnit VARCHAR NOT NULL,
+    so2Unit VARCHAR NOT NULL,
+    nh3Unit VARCHAR NOT NULL,
+    oxygenUnit VARCHAR NOT NULL,
+
+    UNIQUE(deviceid, timestamp)
+);
+
+CREATE TABLE uhoo_homes (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deviceid VARCHAR NOT NULL,
+    virusIndex INT NOT NULL,
+    temperature DOUBLE PRECISION NOT NULL,
+    humidity DOUBLE PRECISION NOT NULL,
+    pm25 INT NOT NULL,
+    tvoc INT NOT NULL,
+    co2 INT NOT NULL,
+    co INT NOT NULL,
+    airPressure DOUBLE PRECISION NOT NULL,
+    ozone INT NOT NULL,
+    no2 INT NOT NULL,
     timestamp INT NOT NULL,
     temperatureUnit VARCHAR NOT NULL,
     tempUnit VARCHAR NOT NULL,

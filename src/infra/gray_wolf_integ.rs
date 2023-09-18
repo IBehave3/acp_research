@@ -33,7 +33,7 @@ pub fn start_gray_wolf_poll(pool: Arc<DbPool>) {
             Ok(rt) => rt,
             Err(err) => {
                 error!("{err}");
-                panic!("unable to start uhoo_aura poll");
+                panic!("unable to start uhoo_business poll");
             }
         };
 

@@ -16,16 +16,18 @@ use crate::infra::jwt_middleware::AuthenticatedClaims;
 use crate::model::jwt_model::{JwtCustomClaims, JwtToken};
 use crate::model::user_model::{
     ClientCreateUser, ClientGetUserInformation, ClientLoginUser, ClientUpdateUserAirthings,
-    ClientUpdateUserGrayWolf, ClientUpdateUserUhooAura, CreateUser, CreateUserAirthings,
-    CreateUserGrayWolf, CreateUserUhooAura, UpdateUserAirthings, UpdateUserGrayWolf,
-    UpdateUserUhooAura, User, UserAirthings, UserGrayWolf, UserUhooAura,
+    ClientUpdateUserGrayWolf, ClientUpdateUserUhooBusiness, CreateUser, CreateUserAirthings,
+    CreateUserGrayWolf, CreateUserUhooBusiness, UpdateUserAirthings, UpdateUserGrayWolf,
+    UpdateUserUhooBusiness, User, UserAirthings, UserGrayWolf, UserUhooBusiness, UserUhooHome, UpdateUserUhooHome, CreateUserUhooHome, ClientUpdateUserUhooHome,
 };
 use crate::schema::user_airthings::dsl::user_airthings;
 use crate::schema::user_airthings::{self as user_airthings_fields};
 use crate::schema::user_gray_wolfs::dsl::user_gray_wolfs;
 use crate::schema::user_gray_wolfs::{self as user_gray_wolfs_fields};
-use crate::schema::user_uhoo_auras::dsl::user_uhoo_auras;
-use crate::schema::user_uhoo_auras::{self as user_uhoo_auras_fields};
+use crate::schema::user_uhoo_business::dsl::user_uhoo_business;
+use crate::schema::user_uhoo_business::{self as user_uhoo_business_fields};
+use crate::schema::user_uhoo_homes::dsl::user_uhoo_homes;
+use crate::schema::user_uhoo_homes::{self as user_uhoo_homes_fields};
 use crate::schema::users::dsl::users;
 use crate::schema::users::{self as users_fields};
 
@@ -44,23 +46,27 @@ pub async fn get_user(
         User,
         Option<UserAirthings>,
         Option<UserGrayWolf>,
-        Option<UserUhooAura>,
+        Option<UserUhooBusiness>,
+        Option<UserUhooHome>,
     ) = users_fields::table
         .find(authenticated_claims.user_id)
         .left_join(user_airthings_fields::table)
         .left_join(user_gray_wolfs_fields::table)
-        .left_join(user_uhoo_auras_fields::table)
+        .left_join(user_uhoo_business_fields::table)
+        .left_join(user_uhoo_homes_fields::table)
         .select((
             User::as_select(),
             Option::<UserAirthings>::as_select(),
             Option::<UserGrayWolf>::as_select(),
-            Option::<UserUhooAura>::as_select(),
+            Option::<UserUhooBusiness>::as_select(),
+            Option::<UserUhooHome>::as_select(),
         ))
         .first::<(
             User,
             Option<UserAirthings>,
             Option<UserGrayWolf>,
-            Option<UserUhooAura>,
+            Option<UserUhooBusiness>,
+            Option<UserUhooHome>,
         )>(database_connection)
         .await
         .unwrap();
@@ -69,7 +75,8 @@ pub async fn get_user(
         user: user_information.0,
         airthings: user_information.1,
         gray_wolf: user_information.2,
-        uhoo_aura: user_information.3,
+        uhoo_business: user_information.3,
+        uhoo_home: user_information.4,
     }))
 }
 
@@ -277,28 +284,28 @@ pub async fn update_user_gray_wolf(
     Ok(HttpResponse::Ok().finish())
 }
 
-pub async fn update_user_uhoo_aura(
+pub async fn update_user_uhoo_business(
     pool: Arc<DbPool>,
     authenticated_claims: AuthenticatedClaims,
-    client_update_user_uhoo_aura: ClientUpdateUserUhooAura,
+    client_update_user_uhoo_business: ClientUpdateUserUhooBusiness,
 ) -> actix_web::Result<impl Responder> {
     let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
 
-    let device_ids: Vec<String> = client_update_user_uhoo_aura
+    let device_ids: Vec<String> = client_update_user_uhoo_business
         .device_ids
         .into_iter()
         .collect();
 
-    match diesel::insert_into(user_uhoo_auras)
-        .values(CreateUserUhooAura {
+    match diesel::insert_into(user_uhoo_business)
+        .values(CreateUserUhooBusiness {
             userid: authenticated_claims.user_id,
-            clientsecret: client_update_user_uhoo_aura.client_secret.to_owned(),
+            clientsecret: client_update_user_uhoo_business.client_secret.to_owned(),
             deviceids: device_ids.to_owned(),
         })
-        .on_conflict(user_uhoo_auras_fields::userid)
+        .on_conflict(user_uhoo_business_fields::userid)
         .do_update()
-        .set(UpdateUserUhooAura {
-            clientsecret: client_update_user_uhoo_aura.client_secret,
+        .set(UpdateUserUhooBusiness {
+            clientsecret: client_update_user_uhoo_business.client_secret,
             deviceids: device_ids,
         })
         .execute(database_connection)
@@ -309,7 +316,7 @@ pub async fn update_user_uhoo_aura(
             error!("{err}");
 
             return Err(api_error::ApiError::DbError {
-                message: "update_user_uhoo_aura failed".to_string(),
+                message: "update_user_uhoo_business failed".to_string(),
             }
             .into());
         }
@@ -317,6 +324,48 @@ pub async fn update_user_uhoo_aura(
 
     Ok(HttpResponse::Ok().finish())
 }
+
+pub async fn update_user_uhoo_home(
+    pool: Arc<DbPool>,
+    authenticated_claims: AuthenticatedClaims,
+    client_update_user_uhoo_home: ClientUpdateUserUhooHome,
+) -> actix_web::Result<impl Responder> {
+    let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
+
+    let device_ids: Vec<String> = client_update_user_uhoo_home
+        .device_ids
+        .into_iter()
+        .collect();
+
+    match diesel::insert_into(user_uhoo_homes)
+        .values(CreateUserUhooHome {
+            userid: authenticated_claims.user_id,
+            clientsecret: client_update_user_uhoo_home.client_secret.to_owned(),
+            deviceids: device_ids.to_owned(),
+        })
+        .on_conflict(user_uhoo_homes_fields::userid)
+        .do_update()
+        .set(UpdateUserUhooHome {
+            clientsecret: client_update_user_uhoo_home.client_secret,
+            deviceids: device_ids,
+        })
+        .execute(database_connection)
+        .await
+    {
+        Ok(blog_id) => blog_id,
+        Err(err) => {
+            error!("{err}");
+
+            return Err(api_error::ApiError::DbError {
+                message: "update_user_uhoo_home failed".to_string(),
+            }
+            .into());
+        }
+    };
+
+    Ok(HttpResponse::Ok().finish())
+}
+
 
 pub async fn get_airthings_users(
     connection: &mut AsyncPgConnection,
@@ -340,13 +389,25 @@ pub async fn get_gray_wolf_users(
     Ok(gray_wolf_users)
 }
 
-pub async fn get_uhoo_aura_users(
+pub async fn get_uhoo_business_users(
     connection: &mut AsyncPgConnection,
-) -> anyhow::Result<Vec<UserUhooAura>> {
-    let uhoo_aura_users: Vec<UserUhooAura> = user_uhoo_auras
-        .select(UserUhooAura::as_select())
+) -> anyhow::Result<Vec<UserUhooBusiness>> {
+    let uhoo_business_users: Vec<UserUhooBusiness> = user_uhoo_business
+        .select(UserUhooBusiness::as_select())
         .load(connection)
         .await?;
 
-    Ok(uhoo_aura_users)
+    Ok(uhoo_business_users)
 }
+
+pub async fn get_uhoo_home_users(
+    connection: &mut AsyncPgConnection,
+) -> anyhow::Result<Vec<UserUhooHome>> {
+    let uhoo_home_users: Vec<UserUhooHome> = user_uhoo_homes
+        .select(UserUhooHome::as_select())
+        .load(connection)
+        .await?;
+
+    Ok(uhoo_home_users)
+}
+

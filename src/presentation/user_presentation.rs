@@ -3,7 +3,7 @@ use crate::{
     infra::{database::DbPool, jwt_middleware::AuthenticatedClaims},
     model::user_model::{
             ClientCreateUser, ClientLoginUser, ClientUpdateUserAirthings, ClientUpdateUserGrayWolf,
-            ClientUpdateUserUhooAura,
+            ClientUpdateUserUhooBusiness, ClientUpdateUserUhooHome,
         },
 };
 use actix_web::{
@@ -64,16 +64,31 @@ pub async fn gray_wolf_user_patch_handler(
     .await
 }
 
-#[patch("/uhoo-aura-user")]
-pub async fn uhoo_aura_user_patch_handler(
+#[patch("/uhoo-business-user")]
+pub async fn uhoo_business_user_patch_handler(
     pool: Data<DbPool>,
     authenticated_claims: web::ReqData<AuthenticatedClaims>,
-    uhoo_aura_update: Json<ClientUpdateUserUhooAura>,
+    uhoo_business_update: Json<ClientUpdateUserUhooBusiness>,
 ) -> Result<impl Responder> {
-    user_controller::update_user_uhoo_aura(
+    user_controller::update_user_uhoo_business(
         pool.into_inner(),
         authenticated_claims.into_inner(),
-        uhoo_aura_update.into_inner(),
+        uhoo_business_update.into_inner(),
     )
     .await
 }
+
+#[patch("/uhoo-home-user")]
+pub async fn uhoo_home_user_patch_handler(
+    pool: Data<DbPool>,
+    authenticated_claims: web::ReqData<AuthenticatedClaims>,
+    uhoo_home_update: Json<ClientUpdateUserUhooHome>,
+) -> Result<impl Responder> {
+    user_controller::update_user_uhoo_home(
+        pool.into_inner(),
+        authenticated_claims.into_inner(),
+        uhoo_home_update.into_inner(),
+    )
+    .await
+}
+

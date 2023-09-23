@@ -195,6 +195,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "keychain-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"apiKey\": \"579c210c-1f30-401b-a222-06d1f5ee277b\",\n    \"deviceMacs\": [\"D0:33:DF:B8:70:16\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/auth/keychain-user",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"keychain-user"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -394,7 +422,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTU1MDI3NjQsImV4cCI6MTY5NTU4OTE2NCwibmJmIjoxNjk1NTAyNzY0LCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImliZWhhdmUzQGdtYWlsLmNvbSJ9.FRlGhoLWg8IJlMBv25a0P-4A0EF7OUWZBCX6I41ff0I",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTU1MTA2NjksImV4cCI6MTY5NTU5NzA2OSwibmJmIjoxNjk1NTEwNjY5LCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImliZWhhdmUzQGdtYWlsLmNvbSJ9.PpYlWQHK2Thq9jeiGdy0YZY7CkQomzEq_gBOKocSZ1g",
 				"type": "string"
 			}
 		]

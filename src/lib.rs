@@ -54,7 +54,7 @@ pub async fn start_server() -> std::io::Result<()> {
     let database_connection_string = &database_config.database_url;
 
     let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_connection_string);
-    let pool = match Pool::builder(config).max_size(15).build() {
+    let pool = match Pool::builder(config).max_size(25).build() {
         Ok(pool) => pool,
         Err(err) => {
             panic!("{err}");
@@ -64,8 +64,8 @@ pub async fn start_server() -> std::io::Result<()> {
     let pool_arc = Arc::new(pool);
 
     // NOTE: start polling
-    start_keychain_poll(pool_arc.clone());
     if api_config.pollsensors {
+        start_keychain_poll(pool_arc.clone());
         start_airthings_poll(pool_arc.clone());
         start_uhoo_business_poll(pool_arc.clone());
         start_uhoo_home_poll(pool_arc.clone());

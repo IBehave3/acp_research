@@ -1,5 +1,9 @@
-pub mod auth;
-pub mod notification;
-pub mod push_data;
-pub mod test;
-pub mod socket;
+pub mod jwt_controller;
+pub mod airthings_controller;
+pub mod fitbit_controller;
+pub mod user_controller;
+pub mod gray_wolf_controller;
+pub mod uhoo_business_controller;
+pub mod survey_controller;
+pub mod uhoo_home_controller;
+pub mod gis_location_controller;

@@ -1,27 +1,37 @@
+use core::panic;
+use std::sync::Arc;
 
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, web::Data, App, HttpServer};
 
-
+use diesel_async::pooled_connection::deadpool::Pool;
+use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use diesel_async::AsyncPgConnection;
 use env_logger::Env;
 use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
-
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
-use crate::infra::uhoo_aura_integ::start_uhoo_aura_poll;
+use crate::infra::jwt_middleware;
+use crate::infra::uhoo_business_integ::start_uhoo_business_poll;
+use crate::infra::uhoo_home_integ::start_uhoo_home_poll;
+use crate::model::jwt_model::JwtToken;
+use crate::startup::DATABASE_CONFIG;
 
 mod controller;
 mod infra;
 mod model;
 mod presentation;
+mod schema;
 mod startup;
 
 pub async fn start_server() -> std::io::Result<()> {
     env_logger::try_init_from_env(Env::default().default_filter_or("info"))
         .expect("Error failed to init logger");
+
+    JwtToken::init_jwt_key();
 
     on_startup().await;
 
@@ -29,62 +39,82 @@ pub async fn start_server() -> std::io::Result<()> {
         Some(api_config) => api_config,
         None => panic!("Error API_CONFIG not initialized"),
     };
+    let database_config = match DATABASE_CONFIG.get() {
+        Some(database_config) => database_config,
+        None => panic!("Error DATABASE_CONFIG not initialized"),
+    };
 
-    // NOTE: start polling
-    if api_config.pollsensors {
-        start_airthings_poll();
-        start_uhoo_aura_poll();
-        start_gray_wolf_poll();
-    }
+    info!("{:#?}", api_config);
+    info!("{:#?}", database_config);
 
     let host = &api_config.host;
     let port = api_config.port;
-    let socket_port = api_config.socketport;
+    let database_connection_string = &database_config.database_url;
 
-    info!("server listening at {host}:{port}");
-    info!("socket server listening at {host}:{socket_port}");
+    let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_connection_string);
+    let pool = match Pool::builder(config).max_size(15).build() {
+        Ok(pool) => pool,
+        Err(err) => {
+            panic!("{err}");
+        }
+    };
 
-    // NOTE: web socket server
-    let h1 = HttpServer::new(|| App::new().route("/socket", web::get().to(presentation::socket::socket_handler)))
-    .bind((host.clone(), api_config.socketport))?
-    .run();
+    let pool_arc = Arc::new(pool);
 
-    // NOTE: http server
-    let h2 = HttpServer::new(|| {
-        App::new().wrap(Logger::default()).service(
-            web::scope("/api")
-                // NOTE: test endpoints
-                .service(presentation::test::test_get_handler)
-                // NOTE: push_data endpoints
-                .service(presentation::push_data::push_data_get_handler)
-                .service(presentation::push_data::push_data_post_handler)
-                // NOTE: notification endpoints
-                .service(presentation::notification::notification_get_handler)
-                .service(presentation::notification::notification_post_handler)
-                // NOTE: datastructure endpoints
-                .service(presentation::datastructure::datastructure_post_handler)
-                .service(presentation::datastructure::reset_datastructure_get_handler)
-                // NOTE: device endpoints
-                .service(presentation::device::device_delete_handler)
-                .service(
-                    web::scope("/auth")
-                        // NOTE: auth endpoints
-                        .service(presentation::auth::create_user_post_handler)
-                        .service(presentation::auth::login_user_get_handler)
-                        .service(presentation::auth::remove_user_delete_handler),
-                )
-                .service(
-                    web::scope("/manage")
-                        // NOTE: container endpoints
-                        .service(presentation::manage::container_get_handler)
-                        .service(presentation::manage::container_name_get_handler),
-                ),
-        )
+    // NOTE: start polling
+    if api_config.pollsensors {
+        start_airthings_poll(pool_arc.clone());
+        start_uhoo_business_poll(pool_arc.clone());
+        start_uhoo_home_poll(pool_arc.clone());
+        start_gray_wolf_poll(pool_arc.clone());
+    }
+
+    let app_data = Data::from(pool_arc);
+
+    let api_server = HttpServer::new(move || {
+        App::new()
+            .app_data(app_data.clone())
+            .wrap(Logger::default())
+            .service(
+                web::scope("/api")
+                    .service(presentation::test_presentation::test_get_handler)
+                    .service(
+                        web::scope("/auth-init")
+                            .service(presentation::user_presentation::create_user_post_handler)
+                            .service(presentation::user_presentation::login_user_get_handler),
+                    )
+                    .service(
+                        web::scope("/auth")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::user_presentation::information_user_get_handler)
+                            .service(presentation::user_presentation::airthings_user_patch_handler)
+                            .service(presentation::user_presentation::gray_wolf_user_patch_handler)
+                            .service(presentation::user_presentation::uhoo_business_user_patch_handler)
+                            .service(presentation::user_presentation::uhoo_home_user_patch_handler)
+                    )
+                    .service(
+                        web::scope("/fitbit")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::fitbit_presentation::create_fitbit_post_handler),
+                    )
+                    .service(
+                        web::scope("/survey")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::survey_presentation::create_hourly_survey_post_presentation)
+                            .service(presentation::survey_presentation::create_daily_survey_post_presentation),
+                    )
+                    .service(
+                        web::scope("/location")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::gis_location_presentation::create_gis_location_post_presentation)
+                    ),
+            )
     })
     .bind((host.clone(), port))?
     .run();
 
-    futures::future::try_join(h1, h2).await?;
+    info!("api server listening at {host}:{port}");
+    api_server.await?;
 
     Ok(())
 }

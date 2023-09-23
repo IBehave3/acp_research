@@ -1,17 +1,15 @@
-use chrono::Utc;
-
 use core::panic;
 use log::{error, info};
-use mongodb::{bson, bson::oid::ObjectId};
+
 use reqwest::{Client, Response};
 
-use std::thread;
+use std::{thread, sync::Arc};
 use std::time::Duration;
 
-use crate::{
-    infra::collection::BaseCollection,
-    model::{auth::IdMapping, push_data::{PushData, UserPushData}},
-};
+use crate::controller::{user_controller, gray_wolf_controller};
+use crate::model::gray_wolf_model::ClientGrayWolf;
+
+use super::database::DbPool;
 
 const QUERY_FREQ_SECS: u64 = 60;
 
@@ -26,7 +24,7 @@ pub async fn get_device_data(
     Ok(response)
 }
 
-pub fn start_gray_wolf_poll() {
+pub fn start_gray_wolf_poll(pool: Arc<DbPool>) {
     thread::spawn(move || {
         let rt = match tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -35,98 +33,77 @@ pub fn start_gray_wolf_poll() {
             Ok(rt) => rt,
             Err(err) => {
                 error!("{err}");
-                panic!("unable to start uhoo_aura poll");
+                panic!("unable to start uhoo_business poll");
             }
         };
 
         loop {
-            let id_mappings = match rt.block_on(IdMapping::get_airthings_users()) {
-                Ok(id_mappings) => id_mappings,
+            let connection = &mut rt.block_on(pool.get()).unwrap();
+
+            let user_gray_wolfs = match rt.block_on(user_controller::get_gray_wolf_users(connection)) {
+                Ok(user_gray_wolfs) => user_gray_wolfs,
                 Err(err) => {
                     error!("{err}");
                     continue;
                 }
             };
 
-            for id_mapping in id_mappings {
-                for device_id_mapping in id_mapping.data_structure_device_id_mapping {
-                    if device_id_mapping.data_structure_id.eq("gray_wolf") {
-                        let device_id_mapping_ref = match device_id_mapping.auth.as_ref() {
-                            Some(device_id_mapping_ref) => device_id_mapping_ref,
-                            None => {
-                                error!("no gray_wolf data structure found for user");
+            for user_gray_wolf in user_gray_wolfs {
+                let device_ids = match user_gray_wolf.deviceids {
+                    Some(device_ids) => device_ids,
+                    None => {
+                        continue;
+                    }
+                };
+
+                let api_key = user_gray_wolf.apikey;
+
+                for device_id in device_ids {
+                    let device_id = match device_id {
+                        Some(device_id) => device_id,
+                        None => {
+                            continue;
+                        }
+                    };
+
+                    let response = match rt.block_on(get_device_data(&api_key, &device_id)) {
+                        Ok(response) => response,
+                        Err(err) => {
+                            error!("{err}");
+                            continue;
+                        }
+                    };
+
+                    if response.status() == 200 {
+                        let user_ref_id = user_gray_wolf.userid;
+                        info!("gray_wolf writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
+
+                        let string_json = match rt.block_on(response.text()) {
+                            Ok(string) => string,
+                            Err(err) => {
+                                error!("{err}");
                                 continue;
                             }
                         };
-                        let api_key = match device_id_mapping_ref.api_key.clone() {
-                            Some(api_key) => api_key,
-                            None => {
-                                error!("no api_key found for gray_wolf");
+
+                        let string: String = match serde_json::from_str(&string_json) {
+                            Ok(string) => string,
+                            Err(err) => {
+                                error!("{err}");
                                 continue;
                             }
                         };
 
-                        let device_ids = match device_id_mapping.device_ids {
-                            Some(device_ids) => device_ids,
-                            None => {
-                                error!("no device ids found for gray_wolf");
+                        let client_gray_wolf: ClientGrayWolf = match serde_json::from_str(&string) {
+                            Ok(json) => json,
+                            Err(err) => {
+                                error!("{err}");
                                 continue;
                             }
                         };
 
-                        for device_id in device_ids {
-                            let response = match rt.block_on(get_device_data(&api_key, &device_id))
-                            {
-                                Ok(response) => response,
-                                Err(err) => {
-                                    error!("{err}");
-                                    continue;
-                                }
-                            };
-
-                            if response.status() == 200 {
-                                let user_ref_id = id_mapping._id;
-                                info!("gray_wolf writing data for (user_id, device_id): ({user_ref_id}, {device_id})");
-
-                                let string_json = match rt.block_on(response.text()) {
-                                    Ok(string) => string,
-                                    Err(err) => {
-                                        error!("{err}");
-                                        continue;
-                                    }
-                                };
-
-                                let string: String = match serde_json::from_str(&string_json) {
-                                    Ok(string) => string,
-                                    Err(err) => {
-                                        error!("{err}");
-                                        continue;
-                                    }
-                                };
-
-                                let json: UserPushData = match serde_json::from_str(&string) {
-                                    Ok(json) => json,
-                                    Err(err) => {
-                                        error!("{err}");
-                                        continue;
-                                    }
-                                };
-
-                                match rt.block_on(PushData::add(PushData {
-                                    _id: ObjectId::new(),
-                                    device_id: Some(device_id),
-                                    created_at: bson::DateTime::from_chrono(Utc::now()),
-                                    data_structure_id: "gray_wolf".to_string(),
-                                    id_mapping_ref_id: user_ref_id,
-                                    data: json,
-                                })) {
-                                    Ok(_) => (),
-                                    Err(err) => {
-                                        error!("{err}");
-                                        continue;
-                                    }
-                                }
-                            }
+                        if let Err(err) = rt.block_on(gray_wolf_controller::create_gray_wolf(connection, client_gray_wolf, user_ref_id, device_id)) {
+                            error!("{err}");
                         }
                     }
                 }

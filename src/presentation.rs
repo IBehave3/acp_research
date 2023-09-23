@@ -1,8 +1,5 @@
-pub mod auth;
-pub mod datastructure;
-pub mod device;
-pub mod manage;
-pub mod notification;
-pub mod push_data;
-pub mod test;
-pub mod socket;
+pub mod user_presentation;
+pub mod test_presentation;
+pub mod fitbit_presentation;
+pub mod survey_presentation;
+pub mod gis_location_presentation;

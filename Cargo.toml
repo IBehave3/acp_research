@@ -15,7 +15,9 @@ name = "acp_research"
 actix = "0.13.0"
 actix-web = "4.3.1"
 actix-web-actors = "4.2.0"
+actix-web-httpauth = "0.8.0"
 async-trait = "0.1.71"
+bcrypt = "0.15.0"
 bson = { version = "2.6.1", features = ["chrono-0_4"] }
 chrono = { version = "0.4.26", features = ["serde"] }
 curl = "0.4.44"
@@ -24,11 +26,16 @@ env_logger = "0.10.0"
 envy = "0.4.2"
 executor = "0.8.4"
 futures = "0.3.28"
+futures-util = "0.3.28"
+jwt-simple = "0.11.6"
 log = "0.4.19"
-mongodb = "2.6.0"
 oauth2 = "4.4.1"
 reqwest = "0.11.18"
 serde = { version = "1.0.171", features = ["derive"] }
 serde_json = "1.0.104"
-tokio = "1.29.1"
+tokio = { version = "1.29.1", features = ["full"] }
 urlencoding = "2.1.3"
+anyhow = "1.0.75"
+diesel = { version = "2.1.1", features = ["chrono", "64-column-tables"] }
+diesel-async = { version = "0.3.2", features = ["postgres", "deadpool"] }
+derive_more = "0.99.17"

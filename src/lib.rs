@@ -16,6 +16,7 @@ use crate::controller::vehicle_controller;
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;
+use crate::infra::keychain_integ::start_keychain_poll;
 use crate::infra::uhoo_business_integ::start_uhoo_business_poll;
 use crate::infra::uhoo_home_integ::start_uhoo_home_poll;
 use crate::model::jwt_model::JwtToken;
@@ -63,6 +64,7 @@ pub async fn start_server() -> std::io::Result<()> {
     let pool_arc = Arc::new(pool);
 
     // NOTE: start polling
+    start_keychain_poll(pool_arc.clone());
     if api_config.pollsensors {
         start_airthings_poll(pool_arc.clone());
         start_uhoo_business_poll(pool_arc.clone());
@@ -92,6 +94,7 @@ pub async fn start_server() -> std::io::Result<()> {
                             .service(presentation::user_presentation::gray_wolf_user_patch_handler)
                             .service(presentation::user_presentation::uhoo_business_user_patch_handler)
                             .service(presentation::user_presentation::uhoo_home_user_patch_handler)
+                            .service(presentation::user_presentation::keychain_user_patch_handler)
                     )
                     .service(
                         web::scope("/fitbit")

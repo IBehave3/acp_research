@@ -90,6 +90,18 @@ pub struct UserUhooHome {
     pub deviceids: Option<Vec<Option<String>>>,
 }
 
+#[derive(
+    Queryable, Selectable, Identifiable, Associations, Serialize, Deserialize, Debug, PartialEq,
+)]
+#[diesel(belongs_to(User, foreign_key = userid))]
+#[diesel(table_name = crate::schema::user_keychains)]
+pub struct UserKeychain {
+    pub id: i32,
+    pub userid: i32,
+    pub apikey: String,
+    pub devicemacs: Option<Vec<Option<String>>>,
+}
+
 // NOTE: client types -------------------------------
 #[derive(Serialize, Deserialize)]
 pub struct ClientLoginUser {
@@ -185,6 +197,14 @@ pub struct ClientUpdateUserUhooHome {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct ClientUpdateUserKeychain {
+    #[serde(rename = "apiKey")]
+    pub api_key: String,
+    #[serde(rename = "deviceMacs")]
+    pub device_macs: HashSet<String>,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct ClientGetUserInformation {
     #[serde(flatten)]
     pub user: User,
@@ -192,6 +212,7 @@ pub struct ClientGetUserInformation {
     pub gray_wolf: Option<UserGrayWolf>,
     pub uhoo_business: Option<UserUhooBusiness>,
     pub uhoo_home: Option<UserUhooHome>,
+    pub keychain: Option<UserKeychain>,
 }
 
 // NOTE: insert types -------------------------------
@@ -261,6 +282,15 @@ pub struct CreateUserUhooHome {
     pub deviceids: Vec<String>,
 }
 
+#[derive(Insertable, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_keychains)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct CreateUserKeyChain {
+    pub userid: i32,
+    pub apikey: String,
+    pub devicemacs: Vec<String>,
+}
+
 // NOTE: update types -------------------------------
 #[derive(AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::user_airthings)]
@@ -295,4 +325,13 @@ pub struct UpdateUserUhooHome {
     pub clientsecret: String,
     pub deviceids: Vec<String>,
 }
+
+#[derive(AsChangeset, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_keychains)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct UpdateUserKeychain {
+    pub apikey: String,
+    pub devicemacs: Vec<String>,
+}
+
 

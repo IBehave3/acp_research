@@ -3,7 +3,7 @@ use crate::{
     infra::{database::DbPool, jwt_middleware::AuthenticatedClaims},
     model::user_model::{
             ClientCreateUser, ClientLoginUser, ClientUpdateUserAirthings, ClientUpdateUserGrayWolf,
-            ClientUpdateUserUhooBusiness, ClientUpdateUserUhooHome,
+            ClientUpdateUserUhooBusiness, ClientUpdateUserUhooHome, ClientUpdateUserKeychain,
         },
 };
 use actix_web::{
@@ -91,4 +91,19 @@ pub async fn uhoo_home_user_patch_handler(
     )
     .await
 }
+
+#[patch("/keychain-user")]
+pub async fn keychain_user_patch_handler(
+    pool: Data<DbPool>,
+    authenticated_claims: web::ReqData<AuthenticatedClaims>,
+    keychain_update: Json<ClientUpdateUserKeychain>,
+) -> Result<impl Responder> {
+    user_controller::update_user_keychain(
+        pool.into_inner(),
+        authenticated_claims.into_inner(),
+        keychain_update.into_inner(),
+    )
+    .await
+}
+
 

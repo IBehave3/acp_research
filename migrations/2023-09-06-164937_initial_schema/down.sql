@@ -1,4 +1,5 @@
 -- This file should undo anything in `up.sql`
+DROP TABLE keychains;
 DROP TABLE vehicle_measurements;
 DROP TABLE gis_locations;
 DROP TABLE daily_surveys;
@@ -17,4 +18,5 @@ DROP TABLE user_airthings;
 DROP TABLE user_gray_wolfs;
 DROP TABLE user_uhoo_business;
 DROP TABLE user_uhoo_homes;
+DROP TABLE user_keychains;
 DROP TABLE users;

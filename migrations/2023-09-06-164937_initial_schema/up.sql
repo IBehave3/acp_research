@@ -37,6 +37,32 @@ CREATE TABLE users (
     longTimeGetOverSetBacks INT NOT NULL
 );
 
+CREATE TABLE user_keychains (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    apiKey VARCHAR NOT NULL,
+    deviceMacs TEXT[],
+    UNIQUE(userId)
+);
+
+CREATE TABLE keychains (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    time TIMESTAMPTZ NOT NULL,
+    devMac VARCHAR NOT NULl,
+    voc DOUBLE PRECISION,
+    pm1 DOUBLE PRECISION,
+    pm25 DOUBLE PRECISION,
+    pm10 DOUBLE PRECISION,
+    t DOUBLE PRECISION,
+    h DOUBLE PRECISION,
+    p DOUBLE PRECISION,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION,
+
+    UNIQUE(userId, time)
+);
+
 CREATE TABLE user_airthings (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,

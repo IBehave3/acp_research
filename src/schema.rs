@@ -137,6 +137,24 @@ diesel::table! {
 }
 
 diesel::table! {
+    keychains (id) {
+        id -> Int4,
+        userid -> Int4,
+        time -> Timestamptz,
+        devmac -> Varchar,
+        voc -> Nullable<Float8>,
+        pm1 -> Nullable<Float8>,
+        pm25 -> Nullable<Float8>,
+        pm10 -> Nullable<Float8>,
+        t -> Nullable<Float8>,
+        h -> Nullable<Float8>,
+        p -> Nullable<Float8>,
+        lat -> Nullable<Float8>,
+        lon -> Nullable<Float8>,
+    }
+}
+
+diesel::table! {
     uhoo_business (id) {
         id -> Int4,
         userid -> Int4,
@@ -251,6 +269,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_keychains (id) {
+        id -> Int4,
+        userid -> Int4,
+        apikey -> Varchar,
+        devicemacs -> Nullable<Array<Nullable<Text>>>,
+    }
+}
+
+diesel::table! {
     user_uhoo_business (id) {
         id -> Int4,
         userid -> Int4,
@@ -326,10 +353,12 @@ diesel::joinable!(gis_locations -> users (userid));
 diesel::joinable!(gray_wolf_sensors -> gray_wolfs (graywolfsid));
 diesel::joinable!(gray_wolfs -> users (userid));
 diesel::joinable!(hourly_surveys -> users (userid));
+diesel::joinable!(keychains -> users (userid));
 diesel::joinable!(uhoo_business -> users (userid));
 diesel::joinable!(uhoo_homes -> users (userid));
 diesel::joinable!(user_airthings -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
+diesel::joinable!(user_keychains -> users (userid));
 diesel::joinable!(user_uhoo_business -> users (userid));
 diesel::joinable!(user_uhoo_homes -> users (userid));
 diesel::joinable!(vehicle_measurements -> users (userid));
@@ -346,10 +375,12 @@ diesel::allow_tables_to_appear_in_same_query!(
     gray_wolf_sensors,
     gray_wolfs,
     hourly_surveys,
+    keychains,
     uhoo_business,
     uhoo_homes,
     user_airthings,
     user_gray_wolfs,
+    user_keychains,
     user_uhoo_business,
     user_uhoo_homes,
     users,

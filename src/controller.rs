@@ -8,3 +8,4 @@ pub mod survey_controller;
 pub mod uhoo_home_controller;
 pub mod gis_location_controller;
 pub mod vehicle_controller;
+pub mod keychain_controller;

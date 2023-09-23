@@ -18,7 +18,7 @@ use crate::model::user_model::{
     ClientCreateUser, ClientGetUserInformation, ClientLoginUser, ClientUpdateUserAirthings,
     ClientUpdateUserGrayWolf, ClientUpdateUserUhooBusiness, CreateUser, CreateUserAirthings,
     CreateUserGrayWolf, CreateUserUhooBusiness, UpdateUserAirthings, UpdateUserGrayWolf,
-    UpdateUserUhooBusiness, User, UserAirthings, UserGrayWolf, UserUhooBusiness, UserUhooHome, UpdateUserUhooHome, CreateUserUhooHome, ClientUpdateUserUhooHome,
+    UpdateUserUhooBusiness, User, UserAirthings, UserGrayWolf, UserUhooBusiness, UserUhooHome, UpdateUserUhooHome, CreateUserUhooHome, ClientUpdateUserUhooHome, UserKeychain, ClientUpdateUserKeychain, UpdateUserKeychain,
 };
 use crate::schema::user_airthings::dsl::user_airthings;
 use crate::schema::user_airthings::{self as user_airthings_fields};
@@ -28,8 +28,11 @@ use crate::schema::user_uhoo_business::dsl::user_uhoo_business;
 use crate::schema::user_uhoo_business::{self as user_uhoo_business_fields};
 use crate::schema::user_uhoo_homes::dsl::user_uhoo_homes;
 use crate::schema::user_uhoo_homes::{self as user_uhoo_homes_fields};
+use crate::schema::user_keychains::dsl::user_keychains;
+use crate::schema::user_keychains::{self as user_keychains_fields};
 use crate::schema::users::dsl::users;
 use crate::schema::users::{self as users_fields};
+use crate::model::user_model::CreateUserKeyChain;
 
 // FIXME: put into env vars
 const BCRYPT_ITERATIONS: u32 = 12;
@@ -48,18 +51,21 @@ pub async fn get_user(
         Option<UserGrayWolf>,
         Option<UserUhooBusiness>,
         Option<UserUhooHome>,
+        Option<UserKeychain>,
     ) = users_fields::table
         .find(authenticated_claims.user_id)
         .left_join(user_airthings_fields::table)
         .left_join(user_gray_wolfs_fields::table)
         .left_join(user_uhoo_business_fields::table)
         .left_join(user_uhoo_homes_fields::table)
+        .left_join(user_keychains_fields::table)
         .select((
             User::as_select(),
             Option::<UserAirthings>::as_select(),
             Option::<UserGrayWolf>::as_select(),
             Option::<UserUhooBusiness>::as_select(),
             Option::<UserUhooHome>::as_select(),
+            Option::<UserKeychain>::as_select()
         ))
         .first::<(
             User,
@@ -67,6 +73,7 @@ pub async fn get_user(
             Option<UserGrayWolf>,
             Option<UserUhooBusiness>,
             Option<UserUhooHome>,
+            Option<UserKeychain>,
         )>(database_connection)
         .await
         .unwrap();
@@ -77,6 +84,7 @@ pub async fn get_user(
         gray_wolf: user_information.2,
         uhoo_business: user_information.3,
         uhoo_home: user_information.4,
+        keychain: user_information.5,
     }))
 }
 
@@ -360,6 +368,47 @@ pub async fn update_user_uhoo_home(
     Ok(HttpResponse::Ok().finish())
 }
 
+pub async fn update_user_keychain(
+    pool: Arc<DbPool>,
+    authenticated_claims: AuthenticatedClaims,
+    client_update_user_keychain: ClientUpdateUserKeychain,
+) -> actix_web::Result<impl Responder> {
+    let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
+
+    let device_macs: Vec<String> = client_update_user_keychain
+        .device_macs
+        .into_iter()
+        .collect();
+
+    match diesel::insert_into(user_keychains)
+        .values(CreateUserKeyChain {
+            userid: authenticated_claims.user_id,
+            apikey: client_update_user_keychain.api_key.to_owned(),
+            devicemacs: device_macs.to_owned(),
+        })
+        .on_conflict(user_keychains_fields::userid)
+        .do_update()
+        .set(UpdateUserKeychain {
+            apikey: client_update_user_keychain.api_key,
+            devicemacs: device_macs,
+        })
+        .execute(database_connection)
+        .await
+    {
+        Ok(blog_id) => blog_id,
+        Err(err) => {
+            error!("{err}");
+
+            return Err(api_error::ApiError::DbError {
+                message: "update_user_keychain failed".to_string(),
+            }
+            .into());
+        }
+    };
+
+    Ok(HttpResponse::Ok().finish())
+}
+
 
 pub async fn get_airthings_users(
     connection: &mut AsyncPgConnection,
@@ -404,4 +453,16 @@ pub async fn get_uhoo_home_users(
 
     Ok(uhoo_home_users)
 }
+
+pub async fn get_keychain_users(
+    connection: &mut AsyncPgConnection,
+) -> anyhow::Result<Vec<UserKeychain>> {
+    let user_keychain_users: Vec<UserKeychain> = user_keychains
+        .select(UserKeychain::as_select())
+        .load(connection)
+        .await?;
+
+    Ok(user_keychain_users)
+}
+
 

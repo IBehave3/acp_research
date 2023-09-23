@@ -8,3 +8,4 @@ pub mod uhoo_business_model;
 pub mod uhoo_home_model;
 pub mod user_model;
 pub mod vehicle_controller_model;
+pub mod keychain_model;

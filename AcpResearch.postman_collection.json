@@ -7,380 +7,347 @@
 	},
 	"item": [
 		{
-			"name": "Client",
+			"name": "Auth",
 			"item": [
 				{
-					"name": "Auth",
-					"item": [
-						{
-							"name": "create-user",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"dataStructureDeviceMapping\": [\r\n        {\r\n            \"dataStructureId\": \"airthings\",\r\n            \"deviceIds\": [\"2960031771\", \"2960032750\"],\r\n            \"auth\": {\r\n                \"clientId\": \"6167b84f-a490-43ab-9378-4e6850a82ff0\",\r\n                \"clientSecret\": \"84ac7286-8db2-4793-878f-5ab17dab5720\",\r\n                \"groupId\": \"520d6c06-f01d-4455-9b62-4534066be6ea\"\r\n            }\r\n        },\r\n        {\r\n            \"dataStructureId\": \"uhoo_business\",\r\n            \"deviceIds\": [\"4c2498d38794\"],\r\n            \"auth\": {\r\n                \"clientSecret\": \"ae1143cb03129a34b0f14ce653649edd6e764239aba91f45\"\r\n            }\r\n        },\r\n        {\r\n            \"dataStructureId\": \"gray_wolf\",\r\n            \"deviceIds\": [\"5823\", \"5826\"],\r\n            \"auth\": {\r\n                \"apiKey\": \"6A54592F5632666A79456179796E3877746B7A6C58773D3D\"\r\n            }\r\n        }\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{full_domain}}/api/auth/create-user?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"create-user"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "login-user",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/auth/login-user?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"login-user"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "remove-user",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/auth/remove-user?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"remove-user"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "DataStructure",
-					"item": [
-						{
-							"name": "data-structure",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"dataStructureId\": \"gray_wolf\",\r\n    \"deviceIds\": [\"5823\", \"5826\"],\r\n    \"auth\": {\r\n        \"apiKey\": \"6A54592F5632666A79456179796E3877746B7A6C58773D3D\"\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{full_domain}}/api/data-structure?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"data-structure"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "reset-datastructure",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/reset-datastructure?userId=noah-lewis&dataStructureId=testDevice",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"reset-datastructure"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										},
-										{
-											"key": "dataStructureId",
-											"value": "testDevice"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Notification",
-					"item": [
-						{
-							"name": "notification",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/notification?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"notification"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "notification",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"message\": \"testMessage\",\r\n    \"statusCode\": 200,\r\n    \"timestamp\": \"2014-09-15T23:14:25.7251173Z\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{full_domain}}/api/notification?userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"notification"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "PushData",
-					"item": [
-						{
-							"name": "push-data",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"message\": \"another test message\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{full_domain}}/api/push-data?dataStructureId=test-device&userId=noah-lewis",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"push-data"
-									],
-									"query": [
-										{
-											"key": "dataStructureId",
-											"value": "test-device"
-										},
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "push-data",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/push-data?dataStructureId=airthings&userId=noah-lewis&deviceId=2960032750",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"push-data"
-									],
-									"query": [
-										{
-											"key": "dataStructureId",
-											"value": "airthings"
-										},
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										},
-										{
-											"key": "deviceId",
-											"value": "2960032750"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Device",
-					"item": [
-						{
-							"name": "remove-device",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{full_domain}}/api/device?userId=noah-lewis&dataStructureId=test-d&deviceId=test",
-									"host": [
-										"{{full_domain}}"
-									],
-									"path": [
-										"api",
-										"device"
-									],
-									"query": [
-										{
-											"key": "userId",
-											"value": "noah-lewis"
-										},
-										{
-											"key": "dataStructureId",
-											"value": "test-d"
-										},
-										{
-											"key": "deviceId",
-											"value": "test"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "Manage",
-			"item": [
-				{
-					"name": "container-name",
+					"name": "create-user",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"ibehave3@gmail.com\",\r\n    \"password\": \"passwords\",\r\n    \"resilience\": {\r\n        \"bounceBackQuickly\": 1,\r\n        \"hardTimeStressfullEvents\": 1,\r\n        \"longRecoveryTime\": 1,\r\n        \"hardToSnapBack\": 1,\r\n        \"comeThroughDifficulTimes\": 1,\r\n        \"longTimeGetOverSetBacks\": 1\r\n    },\r\n    \"demographic\": {\r\n        \"age\": 15,\r\n        \"race\": [\"white\"],\r\n        \"otherRace\": \"otherRace\",\r\n        \"gender\": \"male\",\r\n        \"otherGender\": \"otherGender\",\r\n        \"employed\": false,\r\n        \"levelOfEducation\": \"college\"\r\n    },\r\n    \"stress\": {\r\n        \"unableToControlImportanThings\": 1,\r\n        \"oftenFeltConfidentHandlePersonalProblems\": 1,\r\n        \"feltThingsGoYourWay\": 1,\r\n        \"feltDifficultiesPilingUp\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{full_domain}}/api/manage/container-name",
+							"raw": "{{full_domain}}/api/auth-init/create-user",
 							"host": [
 								"{{full_domain}}"
 							],
 							"path": [
 								"api",
-								"manage",
-								"container-name"
+								"auth-init",
+								"create-user"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "container",
+					"name": "login-user",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"ibehave3@gmail.com\",\n    \"password\": \"passwords\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{full_domain}}/api/manage/container?containerId=id_mapping",
+							"raw": "{{full_domain}}/api/auth-init/login-user",
 							"host": [
 								"{{full_domain}}"
 							],
 							"path": [
 								"api",
-								"manage",
-								"container"
+								"auth-init",
+								"login-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "information-user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{full_domain}}/api/auth/information-user",
+							"host": [
+								"{{full_domain}}"
 							],
-							"query": [
-								{
-									"key": "containerId",
-									"value": "id_mapping"
+							"path": [
+								"api",
+								"auth",
+								"information-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "airthings-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientId\": \"6167b84f-a490-43ab-9378-4e6850a82ff0\",\n    \"clientSecret\": \"84ac7286-8db2-4793-878f-5ab17dab5720\",\n    \"groupId\": \"520d6c06-f01d-4455-9b62-4534066be6ea\",\n    \"deviceIds\": [\n        \"2960032750\",\n        \"2960031771\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/auth/airthings-user",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"airthings-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "gray-wolf-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"apiKey\": \"6A54592F5632666A79456179796E3877746B7A6C58773D3D\",\n    \"deviceIds\": [\n        \"5826\",\n        \"5823\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/auth/gray-wolf-user",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"gray-wolf-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "uhoo-business-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientSecret\": \"ae1143cb03129a34b0f14ce653649edd6e764239aba91f45\",\n    \"deviceIds\": [\n        \"4c2498d38794\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/auth/uhoo-business-user",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"uhoo-business-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "uhoo-home-user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientSecret\": \"c70e35014fa75a43460a7309fa5809d14e5676305a0cbac4\",\n    \"deviceIds\": [\n        \"685E1C538EEF\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/auth/uhoo-home-user",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"uhoo-home-user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fitbit",
+			"item": [
+				{
+					"name": "create-fitbit",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"heartRate\": [\n        {\n            \"timestampISO\": \"2023-08-28T19:09:16.941Z\",\n            \"heartRate\": 100\n        }\n    ],\n    \"accelerometer\": [\n        {\n            \"timestampISO\": \"2023-08-28T19:09:16.941Z\",\n            \"x\": 13,\n            \"y\": 15,\n            \"z\": 15\n        }\n    ],\n    \"barometer\": [\n        {\n            \"timestampISO\": \"2023-08-28T19:09:16.941Z\",\n            \"pressure\": 32\n        }\n    ],\n    \"gyroscope\": [\n        {\n            \"timestampISO\": \"2023-08-28T19:09:16.941Z\",\n            \"x\": 13,\n            \"y\": 15,\n            \"z\": 15\n        }\n    ],\n    \"orientation\": [\n        {\n            \"timestampISO\": \"2023-08-28T19:09:16.941Z\",\n            \"x\": 13,\n            \"y\": 15,\n            \"z\": 15,\n            \"scalar\": 15\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/fitbit",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"fitbit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Survey",
+			"item": [
+				{
+					"name": "create-hourly-survey",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"thermalSensation\": 1,\n    \"thermalAcceptability\": 1,\n    \"thermalComfort\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/survey/hourly",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"survey",
+								"hourly"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-daily-survey",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"unableToControlImportantThings\": 1,\n    \"oftenFeltConfidentHandlePersonalProblems\": 1,\n    \"feelThingsAreGoingMyWay\": 1,\n    \"feelDifficultiesPilingCannotOvercome\": 1,\n\n    \"stressYourHealth\": 1,\n    \"stressYourFinances\": 2,\n    \"stressFamilySocialRelationships\": 1,\n    \"stressYourWord\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/survey/daily",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"survey",
+								"daily"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Location",
+			"item": [
+				{
+					"name": "create-gis-location",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"timestamp\": 100600,\n    \"latitude\": 1,\n    \"longitude\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/location",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"location"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vehicle",
+			"item": [
+				{
+					"name": "create-vehicle-measurement",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Date\": \"date\",\n    \"Time\": \"time\"\n    \"timestampIso8601\": \"2023-08-28T19:09:16.941Z\",\n    \"Speed\": 3,\n    \"Steering Angle\": 3,\n    \"Distance\": 3,\n    \"Velocity\": 3,\n    \"AccelPress\": 3,\n    \"BrakePress\": 3,\n    \"Lane\": 3,\n    \"ScenarioNum\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{full_domain}}/api/vehicle-measurement",
+							"host": [
+								"{{full_domain}}"
+							],
+							"path": [
+								"api",
+								"vehicle-measurement"
 							]
 						}
 					},
@@ -394,6 +361,9 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -419,6 +389,16 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTU1MDI3NjQsImV4cCI6MTY5NTU4OTE2NCwibmJmIjoxNjk1NTAyNzY0LCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImliZWhhdmUzQGdtYWlsLmNvbSJ9.FRlGhoLWg8IJlMBv25a0P-4A0EF7OUWZBCX6I41ff0I",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",

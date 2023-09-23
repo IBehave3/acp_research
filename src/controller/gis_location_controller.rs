@@ -1,11 +1,11 @@
-use std::ops::Sub;
+
 use std::sync::Arc;
 
-use actix_web::cookie::time::Duration;
+
 use actix_web::{HttpResponse, Responder};
-use chrono::{NaiveDateTime, Utc};
+
 use diesel::sql_types::{Double, Integer};
-use diesel::{sql_query, ExpressionMethods, QueryDsl};
+use diesel::{sql_query, ExpressionMethods};
 use diesel_async::RunQueryDsl;
 use log::{error, info};
 
@@ -109,7 +109,9 @@ pub async fn create_gis_location(
         .get_result::<GisLocationRawQueryResult>(database_connection)
         .await
     {
-        Ok(res) => res,
+        Ok(res) => {
+            info!("{:#?}", res);
+        },
         Err(err) => {
             error!("{}", err);
 

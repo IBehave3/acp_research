@@ -95,7 +95,7 @@ pub async fn create_user(
         .map_err(|_| ApiError::HashCreationError)?;
 
     let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
-    let user: User = match diesel::insert_into(users)
+    let _user: User = match diesel::insert_into(users)
         .values(CreateUser {
             username: client_create_user.username,
             passwordhash: hash.to_string(),

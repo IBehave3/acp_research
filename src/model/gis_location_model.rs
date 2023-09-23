@@ -21,12 +21,12 @@ pub struct ClientCreateGisLocation {
 
 #[derive(QueryableByName, Debug)]
 pub struct GisLocationRawQueryResult {
-    #[sql_type = "Integer"]
+    #[diesel(sql_type = Integer)]
     pub location_id: i32,
-    #[sql_type = "Integer"]
+    #[diesel(sql_type = Integer)]
     pub user_id: i32,
-    #[sql_type = "Integer"]
+    #[diesel(sql_type = Integer)]
     pub ts: i32,
-    #[sql_type = "Double"]
+    #[diesel(sql_type = Double)]
     pub distance_in_feet: f64,
 }

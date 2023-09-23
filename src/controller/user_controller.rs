@@ -143,13 +143,7 @@ pub async fn create_user(
         }
     };
 
-    let jwt_token = JwtToken::new(JwtCustomClaims {
-        user_id: user.id,
-        username: user.username,
-    })
-    .map_err(|_| ApiError::TokenCreationError)?;
-
-    Ok(HttpResponse::Created().json(jwt_token))
+    Ok(HttpResponse::Created().finish())
 }
 
 pub async fn login_user(

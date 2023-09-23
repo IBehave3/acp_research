@@ -92,7 +92,8 @@ diesel::table! {
         id -> Int4,
         userid -> Int4,
         createdat -> Timestamptz,
-        timestamp -> Timestamptz,
+        timestamp -> Int4,
+        checked -> Bool,
         latitude -> Float8,
         longitude -> Float8,
     }

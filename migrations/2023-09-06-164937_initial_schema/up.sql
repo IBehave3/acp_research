@@ -303,3 +303,22 @@ CREATE TABLE hourly_surveys (
  
     currentStress Int NOT NULL
 );
+
+CREATE TABLE vehicle_measurements (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    date VARCHAR,
+    time VARCHAR,
+    timestamp INT,
+    timestamp_iso8601 TIMESTAMPTZ,
+    speed DOUBLE PRECISION,
+    steeringAngle DOUBLE PRECISION,
+    distance DOUBLE PRECISION,
+    velocity DOUBLE PRECISION,
+    accelerationPressure DOUBLE PRECISION,
+    brakePressure DOUBLE PRECISION,
+    lane DOUBLE PRECISION,
+    scenarioNumber DOUBLE PRECISION
+);

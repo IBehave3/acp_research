@@ -12,6 +12,7 @@ use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
+use crate::controller::vehicle_controller;
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;
@@ -107,6 +108,11 @@ pub async fn start_server() -> std::io::Result<()> {
                         web::scope("/location")
                             .wrap(jwt_middleware::Auth)
                             .service(presentation::gis_location_presentation::create_gis_location_post_presentation)
+                    )
+                    .service(
+                        web::scope("/vehicle-measurement")
+                            .wrap(jwt_middleware::Auth)
+                            .service(presentation::vehicle_presentation::create_vehicle_measurement_post_handler)
                     ),
             )
     })

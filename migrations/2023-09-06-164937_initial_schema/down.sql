@@ -1,4 +1,5 @@
 -- This file should undo anything in `up.sql`
+DROP TABLE vehicle_measurements;
 DROP TABLE gis_locations;
 DROP TABLE daily_surveys;
 DROP TABLE hourly_surveys;

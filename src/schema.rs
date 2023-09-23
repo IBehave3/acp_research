@@ -295,6 +295,26 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    vehicle_measurements (id) {
+        id -> Int4,
+        userid -> Int4,
+        createdat -> Timestamptz,
+        date -> Nullable<Varchar>,
+        time -> Nullable<Varchar>,
+        timestamp -> Nullable<Int4>,
+        timestamp_iso8601 -> Nullable<Timestamptz>,
+        speed -> Nullable<Float8>,
+        steeringangle -> Nullable<Float8>,
+        distance -> Nullable<Float8>,
+        velocity -> Nullable<Float8>,
+        accelerationpressure -> Nullable<Float8>,
+        brakepressure -> Nullable<Float8>,
+        lane -> Nullable<Float8>,
+        scenarionumber -> Nullable<Float8>,
+    }
+}
+
 diesel::joinable!(airthings -> users (userid));
 diesel::joinable!(daily_surveys -> users (userid));
 diesel::joinable!(fitbit_accelerometers -> users (userid));
@@ -312,6 +332,7 @@ diesel::joinable!(user_airthings -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
 diesel::joinable!(user_uhoo_business -> users (userid));
 diesel::joinable!(user_uhoo_homes -> users (userid));
+diesel::joinable!(vehicle_measurements -> users (userid));
 
 diesel::allow_tables_to_appear_in_same_query!(
     airthings,
@@ -332,4 +353,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     user_uhoo_business,
     user_uhoo_homes,
     users,
+    vehicle_measurements,
 );

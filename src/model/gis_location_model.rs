@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+use diesel::prelude::Insertable;
 use serde::{Deserialize, Serialize};
 
 /*
@@ -65,8 +67,19 @@ WHERE
     record exists within the specified criteria, the query will return no rows.
 */
 
+#[derive(Insertable, Serialize, Deserialize, Debug)]
+#[diesel(table_name = crate::schema::gis_locations)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct CreateGisLocation{
+    pub timestamp: DateTime<Utc>,
+    pub userid: i32,
+    pub longitude: f64,
+    pub latitude: f64,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ClientCreateGisLocation {
+    pub timestamp: DateTime<Utc>,
     pub longitude: f64,
     pub latitude: f64,
 }

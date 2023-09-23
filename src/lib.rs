@@ -63,10 +63,10 @@ pub async fn start_server() -> std::io::Result<()> {
 
     // NOTE: start polling
     if api_config.pollsensors {
-        //start_airthings_poll(pool_arc.clone());
-        //start_uhoo_business_poll(pool_arc.clone());
-        start_uhoo_home_poll(pool_arc.clone())
-        //start_gray_wolf_poll(pool_arc.clone());
+        start_airthings_poll(pool_arc.clone());
+        start_uhoo_business_poll(pool_arc.clone());
+        start_uhoo_home_poll(pool_arc.clone());
+        start_gray_wolf_poll(pool_arc.clone());
     }
 
     let app_data = Data::from(pool_arc);

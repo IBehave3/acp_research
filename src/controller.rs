@@ -6,3 +6,4 @@ pub mod gray_wolf_controller;
 pub mod uhoo_business_controller;
 pub mod survey_controller;
 pub mod uhoo_home_controller;
+pub mod gis_location_controller;

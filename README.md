@@ -60,7 +60,7 @@ sudo -u postgres psql
 CREATE DATABASE acp_research_db;
 CREATE ROLE internal_user LOGIN PASSWORD 'password';
 CREATE ROLE external_user LOGIN PASSWORD 'password';
-GRANT ALL ON DATABASE acp_research_db TO internal_user;
+ALTER USER internal_user SUPERUSER;
 #logout
 sudo psql -h localhost -d acp_research_db -U internal_user -p 27017
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO external_user;

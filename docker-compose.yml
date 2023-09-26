@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    container_name: acp_research_db
+    image: postgres:13 
+    ports:
+      - "5432:5432" 
+    volumes:
+      - database_data:/var/lib/postgresql/data 
+    environment:
+      POSTGRES_USER: dev_internal_user
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: portfolio_db
+    networks:
+      - network
+  portfolio_api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.api
+    container_name: portfolio_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://dev_internal_user:dev_password@db:5432/portfolio_db
+      SERVER_PORT: 8080
+      SERVER_HOST: 0.0.0.0
+      SERVER_POLLSENSORS: true
+    networks:
+      - network
+networks:
+  network:
+volumes:
+  database_data:

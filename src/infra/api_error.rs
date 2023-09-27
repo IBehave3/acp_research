@@ -19,7 +19,7 @@ pub enum ApiError {
     TokenValidationError,
     InvalidPasswordError,
     InvalidUsernameError,
-    UserNotFoundError
+    UserNotFoundError,
 }
 
 impl error::ResponseError<> for ApiError {
@@ -59,7 +59,8 @@ impl error::ResponseError<> for ApiError {
             },
             ApiError::UserNotFoundError => {
                 HttpResponse::NotFound().body("invalid username: user not found")
-            }
+            },
+
         }
     }
 }

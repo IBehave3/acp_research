@@ -133,6 +133,8 @@ diesel::table! {
         userid -> Int4,
         createdat -> Timestamptz,
         currentstress -> Int4,
+        location -> Varchar,
+        timestamp -> Int4,
     }
 }
 

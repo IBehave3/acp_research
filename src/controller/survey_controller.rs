@@ -1,17 +1,20 @@
 use std::sync::Arc;
 
 use actix_web::{HttpResponse, Responder};
+
 use diesel_async::RunQueryDsl;
 use log::error;
 
 use crate::infra::api_error::ApiError;
 use crate::infra::database::DbPool;
 use crate::infra::jwt_middleware::AuthenticatedClaims;
+use crate::model::survey_model::{CreateHourlySurvey};
 use crate::model::survey_model::{
     ClientCreateDailySurvey, ClientCreateHourlySurvey, CreateDailySurvey,
 };
 use crate::schema::daily_surveys::dsl::daily_surveys;
-use crate::{model::survey_model::CreateHourlySurvey, schema::hourly_surveys::dsl::hourly_surveys};
+use crate::schema::hourly_surveys::dsl::hourly_surveys;
+
 
 pub async fn create_hourly_survey(
     pool: Arc<DbPool>,
@@ -25,11 +28,13 @@ pub async fn create_hourly_survey(
         .values(CreateHourlySurvey {
             userid: user_id,
             currentstress: client_hourly_survey.current_stress,
+            location: client_hourly_survey.location,
+            timestamp: client_hourly_survey.timestamp,
         })
         .execute(database_connection)
         .await
         .map_err(|err| {
-            error!("{err}");
+            error!("{}", err);
             ApiError::DbError {
                 message: "create_hourly_survey failed".to_owned(),
             }

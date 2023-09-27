@@ -12,7 +12,7 @@ use log::info;
 use startup::on_startup;
 use startup::API_CONFIG;
 
-use crate::controller::vehicle_controller;
+
 use crate::infra::airthings_integ::start_airthings_poll;
 use crate::infra::gray_wolf_integ::start_gray_wolf_poll;
 use crate::infra::jwt_middleware;

@@ -2,7 +2,7 @@ use chrono::Datelike;
 use core::panic;
 use log::{error, info};
 use reqwest::{Client, Response};
-use serde::{Deserialize, Serialize};
+
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -24,9 +24,9 @@ pub async fn get_device_data(
     let current_date = chrono::Utc::now();
     let url = format!("https://api.atmotube.com/api/v1/data?api_key={}&mac={}&start_date={}-{}-{}", 
     api_key, encode(dev_mac), 
-    current_date.year().to_string(), 
-    current_date.month().to_string(), 
-    current_date.day().to_string());
+    current_date.year(), 
+    current_date.month(), 
+    current_date.day());
 
     let response = Client::new()
         .get(url)

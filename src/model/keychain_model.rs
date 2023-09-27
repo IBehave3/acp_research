@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, DateTime, Utc};
+use chrono::{DateTime, Utc};
 use diesel::{Queryable, Insertable};
 use serde::{Serialize, Deserialize};
 

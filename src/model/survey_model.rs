@@ -1,5 +1,26 @@
-use diesel::prelude::Insertable;
+use chrono::NaiveDateTime;
+use diesel::{prelude::Insertable, Queryable};
 use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct CreateGisLocationResponse {
+    #[serde(rename = "initHourlySurvey")]
+    pub init_hourly_survey: bool,
+    pub reason: String,
+}
+
+
+#[derive(Queryable, Serialize, Deserialize, Debug)]
+#[diesel(table_name = crate::schema::hourly_surveys)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct HourlySurvey {
+    pub id: i32,
+    pub userid: i32,
+    pub createdat: NaiveDateTime,
+    pub currentstress: i32,
+    pub location: String,
+    pub timestamp: i32,
+}
 
 // NOTE: insert models -------------------------------
 #[derive(Insertable, Serialize, Deserialize, Debug)]
@@ -8,6 +29,8 @@ use serde::{Deserialize, Serialize};
 pub struct CreateHourlySurvey {
     pub userid: i32,
     pub currentstress: i32,
+    pub location: String,
+    pub timestamp: i32,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug)]
@@ -31,6 +54,8 @@ pub struct CreateDailySurvey {
 pub struct ClientCreateHourlySurvey {
     #[serde(rename = "currentStress")]
     pub current_stress: i32,
+    pub location: String,
+    pub timestamp: i32,
 }
 
 #[derive(Serialize, Deserialize)]

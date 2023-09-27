@@ -1,25 +1,27 @@
-
 use std::sync::Arc;
-
 
 use actix_web::{HttpResponse, Responder};
 
 use diesel::sql_types::{Double, Integer};
-use diesel::{sql_query, ExpressionMethods};
+use diesel::{sql_query, ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use log::{error, info};
 
 use crate::infra::api_error::{self, ApiError};
 use crate::infra::jwt_middleware::AuthenticatedClaims;
 use crate::model::gis_location_model::{CreateGisLocation, GisLocationRawQueryResult};
+use crate::model::survey_model::{CreateGisLocationResponse, HourlySurvey};
 use crate::schema::gis_locations::dsl::gis_locations;
 use crate::schema::gis_locations::{self as gis_locations_fields};
+use crate::schema::hourly_surveys::dsl::hourly_surveys;
+use crate::schema::hourly_surveys::{self as hourly_surveys_fields};
 use crate::{infra::database::DbPool, model::gis_location_model::ClientCreateGisLocation};
 use diesel::result::{DatabaseErrorKind, Error as diesel_error};
 
 const SURVEY_DELAY_TIME_IN_SECONDS: i32 = 60 * 7;
 const SURVEY_RANGE_TIME_IN_SECONDS: i32 = 60;
 const MAX_DISTANCE_RANGE_IN_FEET: i32 = 40;
+const MIN_TIME_SINCE_LAST_SURVEY_IN_SECONDS: i32 = 60 * 60;
 
 pub async fn create_gis_location(
     pool: Arc<DbPool>,
@@ -27,6 +29,8 @@ pub async fn create_gis_location(
     client_create_gis_location: ClientCreateGisLocation,
 ) -> actix_web::Result<impl Responder> {
     let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
+
+    // NOTE: inserting new timestamp
     match diesel::insert_into(gis_locations)
         .values(CreateGisLocation {
             timestamp: client_create_gis_location.timestamp,
@@ -40,7 +44,6 @@ pub async fn create_gis_location(
         Ok(blog_id) => blog_id,
         Err(err) => {
             error!("{err}");
-
             if let diesel_error::DatabaseError(DatabaseErrorKind::UniqueViolation, _) = err {
                 return Ok(HttpResponse::Conflict().finish());
             }
@@ -59,13 +62,7 @@ pub async fn create_gis_location(
     let user_id = authenticated_claims.user_id;
     let max_distance = MAX_DISTANCE_RANGE_IN_FEET;
 
-    info!("start_time: {}", start_time);
-    info!(
-        "client_time_stamp: {}",
-        client_create_gis_location.timestamp
-    );
-    info!("end_time: {}", end_time);
-
+    // NOTE: checking if user is in the same location he was in x seconds ago
     let res = sql_query("
         WITH time_interval AS (
             SELECT ($1) AS start_time,
@@ -111,14 +108,53 @@ pub async fn create_gis_location(
     {
         Ok(res) => {
             info!("{:#?}", res);
-        },
+        }
         Err(err) => {
-            error!("{}", err);
+            if let diesel_error::NotFound = err {
+                return Ok(HttpResponse::Ok().json(CreateGisLocationResponse {
+                    init_hourly_survey: false,
+                    reason: "user not in the same location".to_string(),
+                }));
+            }
 
-            return Ok(HttpResponse::Ok().body("no"));
+            return Ok(HttpResponse::InternalServerError().finish());
         }
     };
 
+    // NOTE ensuring last survey was not taken to soon
+    let last_survey = match hourly_surveys
+        .filter(hourly_surveys_fields::userid.eq(authenticated_claims.user_id))
+        .limit(1)
+        .order_by(hourly_surveys_fields::timestamp)
+        .get_result::<HourlySurvey>(database_connection)
+        .await
+    {
+        Ok(last_survey) => Some(last_survey),
+        Err(err) => {
+            if let diesel_error::NotFound = err {
+                info!("user has never created hourly survey");
+                None
+            } else {
+                return Ok(HttpResponse::InternalServerError().finish());
+            }
+        }
+    };
+
+    if let Some(last_survey) = last_survey {
+        let last_survey_time = last_survey.timestamp;
+        let current_time = client_create_gis_location.timestamp;
+
+        if current_time - last_survey_time <= MIN_TIME_SINCE_LAST_SURVEY_IN_SECONDS {
+            return Ok(HttpResponse::Ok().json(CreateGisLocationResponse {
+                init_hourly_survey: false,
+                reason: "to soon to submit repeated survey".to_string(),
+            }));
+        }
+    } else {
+        info!("user has never submitted hourly survey");
+    }
+
+    // NOTE: marking old timestamps as checked
     match diesel::update(gis_locations)
         .filter(gis_locations_fields::userid.eq(authenticated_claims.user_id))
         .set(gis_locations_fields::checked.eq(true))
@@ -132,5 +168,8 @@ pub async fn create_gis_location(
         }
     };
 
-    Ok(HttpResponse::Ok().body("yes"))
+    return Ok(HttpResponse::Ok().json(CreateGisLocationResponse {
+        init_hourly_survey: true,
+        reason: "user is in same location and has not taken survey within min time".to_string(),
+    }));
 }

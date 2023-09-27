@@ -1,6 +1,6 @@
 -- Your SQL goes here
 ALTER TABLE hourly_surveys
-ADD location VARCHAR NOT NULL;
+ADD location VARCHAR;
 
 ALTER TABLE hourly_surveys
-ADD timestamp INT NOT NULL;
+ADD timestamp;

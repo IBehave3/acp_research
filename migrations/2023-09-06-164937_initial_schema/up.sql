@@ -327,7 +327,9 @@ CREATE TABLE hourly_surveys (
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
  
-    currentStress Int NOT NULL
+    currentStress INT NOT NULL,
+    timestamp INT NOT NULL,
+    location VARCHAR NOT NULL
 );
 
 CREATE TABLE vehicle_measurements (

@@ -18,8 +18,8 @@ pub struct HourlySurvey {
     pub userid: i32,
     pub createdat: NaiveDateTime,
     pub currentstress: i32,
-    pub location: String,
     pub timestamp: i32,
+    pub location: String,
 }
 
 // NOTE: insert models -------------------------------

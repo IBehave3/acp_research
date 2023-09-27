@@ -113,7 +113,7 @@ pub async fn create_gis_location(
             if let diesel_error::NotFound = err {
                 return Ok(HttpResponse::Ok().json(CreateGisLocationResponse {
                     init_hourly_survey: false,
-                    reason: "user not in the same location".to_string(),
+                    reason: "user not in the same location longer than min time".to_string(),
                 }));
             }
 
@@ -147,7 +147,7 @@ pub async fn create_gis_location(
         if current_time - last_survey_time <= MIN_TIME_SINCE_LAST_SURVEY_IN_SECONDS {
             return Ok(HttpResponse::Ok().json(CreateGisLocationResponse {
                 init_hourly_survey: false,
-                reason: "to soon to submit repeated survey".to_string(),
+                reason: "to soon to submit survey".to_string(),
             }));
         }
     } else {

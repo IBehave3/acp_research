@@ -268,7 +268,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"thermalSensation\": 1,\n    \"thermalAcceptability\": 1,\n    \"thermalComfort\": 1\n}",
+							"raw": "{\n    \"currentStress\": 1,\n    \"location\": \"here\",\n    \"timestamp\": 123\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -329,7 +329,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"timestamp\": 100600,\n    \"latitude\": 1,\n    \"longitude\": 2\n}",
+							"raw": "{\n    \"timestamp\": 100605,\n    \"latitude\": 1,\n    \"longitude\": 2\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -422,7 +422,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTU1MTA2NjksImV4cCI6MTY5NTU5NzA2OSwibmJmIjoxNjk1NTEwNjY5LCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImliZWhhdmUzQGdtYWlsLmNvbSJ9.PpYlWQHK2Thq9jeiGdy0YZY7CkQomzEq_gBOKocSZ1g",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTU4NDQyMTIsImV4cCI6MTY5NTkzMDYxMiwibmJmIjoxNjk1ODQ0MjEyLCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImliZWhhdmUzQGdtYWlsLmNvbSJ9._hGxF88KcU4at5n-TmK_YsMZdxNdYpjsdIY3Fl6Rydw",
 				"type": "string"
 			}
 		]

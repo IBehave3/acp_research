@@ -8,8 +8,12 @@ edition = "2021"
 path = "src/lib.rs"
 
 [[bin]]
-path = "src/main.rs"
-name = "acp_research"
+path = "src/api/main.rs"
+name = "acp_research_api"
+
+[[bin]]
+path = "src/polling/main.rs"
+name = "acp_research_polling"
 
 [dependencies]
 actix = "0.13.0"

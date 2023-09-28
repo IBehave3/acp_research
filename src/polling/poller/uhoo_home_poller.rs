@@ -3,16 +3,11 @@ use log::{error, info};
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 
-
-
-
 use crate::api::controller::user_controller;
 use crate::api::model::user_model::UserUhooHome;
 use crate::polling::controller::uhoo_home_controller;
 use crate::polling::infra::database::CONNECTION_POOL;
 use crate::polling::model::uhoo_home_model::ClientUhooHome;
-
-const QUERY_FREQ_SECS: u64 = 60;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccessTokenResponse {

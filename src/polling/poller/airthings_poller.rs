@@ -1,4 +1,4 @@
-use anyhow::bail;
+
 use log::{info, error};
 use oauth2::basic::{BasicClient, BasicTokenType};
 use oauth2::reqwest::async_http_client;

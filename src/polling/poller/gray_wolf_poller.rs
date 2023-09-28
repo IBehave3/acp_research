@@ -3,15 +3,10 @@ use log::{error, info};
 
 use reqwest::{Client, Response};
 
-
-
-
 use crate::api::controller::user_controller;
 use crate::polling::controller::gray_wolf_controller;
 use crate::polling::infra::database::CONNECTION_POOL;
 use crate::polling::model::gray_wolf_model::ClientGrayWolf;
-
-const QUERY_FREQ_SECS: u64 = 60;
 
 pub async fn get_device_data(
     api_key: &str,

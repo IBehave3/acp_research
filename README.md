@@ -13,10 +13,13 @@
 
 ## Configurint API as Service
 ```
-sudo cp /home/ubuntu/acp_research.service /etc/systemd/system
+sudo cp /home/ubuntu/acp_research/acp_research_polling.service /etc/systemd/system
+sudo cp /home/ubuntu/acp_research/acp_research_api.service /etc/systemd/system
 sudo systemctl daemon-reload
-sudo systemctl start acp_research.service
-sudo systemctl status acp_research.service
+sudo systemctl start acp_research_api
+sudo systemctl start acp_research_polling
+sudo systemctl status acp_research_api_
+sudo systemctl status acp_research_polling
 ```
 
 ## Configuring API

@@ -1,0 +1,29 @@
+# Stage 1: Build the Rust Application
+FROM rust:bookworm as build
+WORKDIR /usr/src/acp_research_api
+COPY . .
+RUN cargo build --release --bin acp_research_api
+
+# Stage 2: Create the Final Image
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y libpq-dev openssl curl gcc
+
+# Install Rust using rustup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Copy your built application and diesel_startup.sh script
+COPY --from=build /usr/src/acp_research_api/target/release/acp_research_api /usr/local/bin/acp_research_api
+COPY --from=build /usr/src/acp_research_api/diesel-startup.sh /usr/local/bin/diesel-startup.sh
+COPY --from=build /usr/src/acp_research_api/migrations /usr/src/acp_research_api/migrations
+
+# Install diesel_cli (assuming it's meant to be used with PostgreSQL)
+RUN cargo install diesel_cli --no-default-features --features "postgres"
+RUN chmod +x /usr/local/bin/diesel-startup.sh
+
+# Setting up environment variables
+ENV SERVER_HOST=0.0.0.0
+ENV SERVER_PORT=8080
+
+EXPOSE 8080
+CMD ["sh", "-c", "diesel-startup.sh && acp_research_api"]

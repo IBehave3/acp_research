@@ -1,0 +1,23 @@
+# Use the official PostgreSQL image as the base image
+FROM postgres:latest
+
+# Set the PostgreSQL superuser password, database, user, and password
+ENV POSTGRES_PASSWORD=password
+ENV POSTGRES_DB=acp_research_db
+ENV POSTGRES_USER=internal_user
+ENV POSTGRES_PASSWORD=password
+ENV PGDATA=/var/lib/postgresql/data
+
+# Expose port 5432 for PostgreSQL
+EXPOSE 5432
+
+# Define a volume to store PostgreSQL data
+VOLUME /var/lib/postgresql/data
+
+# Copy a custom entrypoint script
+COPY custom-entrypoint.sh /docker-entrypoint-initdb.d/custom-entrypoint.sh
+RUN chmod +x /docker-entrypoint-initdb.d/custom-entrypoint.sh
+
+# No need to specify the network configuration in the Dockerfile.
+# You should handle network configuration in your Docker Compose file or with 'docker run' options.
+# Use: docker run --network your_network_name

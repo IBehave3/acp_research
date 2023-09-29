@@ -280,6 +280,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_locations (id) {
+        id -> Int4,
+        userid -> Int4,
+        timestamp -> Int4,
+        location -> Varchar,
+    }
+}
+
+diesel::table! {
     user_uhoo_business (id) {
         id -> Int4,
         userid -> Int4,
@@ -361,6 +370,7 @@ diesel::joinable!(uhoo_homes -> users (userid));
 diesel::joinable!(user_airthings -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
 diesel::joinable!(user_keychains -> users (userid));
+diesel::joinable!(user_locations -> users (userid));
 diesel::joinable!(user_uhoo_business -> users (userid));
 diesel::joinable!(user_uhoo_homes -> users (userid));
 diesel::joinable!(vehicle_measurements -> users (userid));
@@ -383,6 +393,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     user_airthings,
     user_gray_wolfs,
     user_keychains,
+    user_locations,
     user_uhoo_business,
     user_uhoo_homes,
     users,

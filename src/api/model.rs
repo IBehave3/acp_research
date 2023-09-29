@@ -4,3 +4,4 @@ pub mod jwt_model;
 pub mod survey_model;
 pub mod user_model;
 pub mod vehicle_controller_model;
+pub mod user_location_model;

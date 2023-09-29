@@ -332,6 +332,14 @@ CREATE TABLE hourly_surveys (
     location VARCHAR NOT NULL
 );
 
+CREATE TABLE user_locations (
+    id SERIAL PRIMARY KEY,
+    userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    timestamp INT NOT NULL,
+    location VARCHAR NOT NULL
+);
+
 CREATE TABLE vehicle_measurements (
     id SERIAL PRIMARY KEY,
     userId SERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,

@@ -135,6 +135,7 @@ pub async fn start_server() -> std::io::Result<()> {
                         web::scope("/location")
                             .wrap(jwt_middleware::Auth)
                             .service(api::presentation::gis_location_presentation::create_gis_location_post_presentation)
+                            .service(api::presentation::user_location_presentation::create_user_location_post_presentation)
                     )
                     .service(
                         web::scope("/vehicle-measurement")

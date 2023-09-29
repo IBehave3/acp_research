@@ -14,6 +14,7 @@ DROP TABLE uhoo_homes;
 DROP TABLE gray_wolf_sensors;
 DROP TABLE gray_wolfs;
 DROP TABLE airthings;
+DROP TABLE user_locations;
 DROP TABLE user_airthings;
 DROP TABLE user_gray_wolfs;
 DROP TABLE user_uhoo_business;

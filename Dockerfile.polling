@@ -6,13 +6,9 @@ RUN cargo build --release --bin acp_research_polling
 
 # Stage 2: Create the Final Image
 FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y openssl gcc ca-certificates
+RUN apt-get update && apt-get install -y openssl gcc ca-certificates curl wget && rm -rf /var/lib/apt/lists/
 
 # Copy your built application and diesel_startup.sh script
 COPY --from=build /usr/src/acp_research_polling/target/release/acp_research_polling /usr/local/bin/acp_research_polling
-
-# Setting up environment variables
-ENV SERVER_HOST=0.0.0.0
-ENV SERVER_PORT=8080
 
 CMD ["acp_research_polling"]

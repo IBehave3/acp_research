@@ -42,6 +42,13 @@ pub async fn start_polling() -> std::io::Result<()> {
 
     on_polling_startup().await;
 
+    let database_config = match DATABASE_CONFIG.get() {
+        Some(database_config) => database_config,
+        None => panic!("Error DATABASE_CONFIG not initialized"),
+    };
+
+    info!("\n{:#?}", database_config);
+
     loop {
         if let Err(err) =  tokio::try_join!(
             task::spawn(keychain_poll()),

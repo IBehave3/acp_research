@@ -1,4 +1,9 @@
-/target
 .env
-*~
 .jwt.private.key
+
+/ssl
+/target
+
+*~
+*.crt
+*.key

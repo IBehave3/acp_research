@@ -80,18 +80,3 @@ psql -h localhost -U internal_user -d acp_research_db
 ```
 listen_addresses = '*'
 ```
-
-## Build docker containers
-```
-echo "set env vars"
-export HOST_IP=76.165.251.121
-export DB_USER=internal_user
-export DB_PASSWORD=password
-
-sudo docker build -f Dockerfile.api -t acp-research-api .
-sudo docker run -d -p 8080:8080 --name acp-research-api -e DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${HOST_IP}/acp_research_db acp-research-api:latest
-sudo docker build -f Dockerfile.polling -t acp-research-polling .
-sudo docker run -d --name acp-research-polling -e DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${HOST_IP}/acp_research_db acp-research-polling:latest
-sudo docker build -f Dockerfile.db -t acp-research-db .
-sudo docker run -d -p 5432:5432 --name acp-research-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=acp_research_db -e POSTGRES_USER=internal_user -v /data/postgres:/var/lib/postgresql/data acp-research-db:latest
-```

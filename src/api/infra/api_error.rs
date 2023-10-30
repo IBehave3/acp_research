@@ -20,6 +20,7 @@ pub enum ApiError {
     InvalidPasswordError,
     InvalidUsernameError,
     UserNotFoundError,
+    FitbitTwoVerificationCodeNotFound,
 }
 
 impl error::ResponseError<> for ApiError {
@@ -60,7 +61,9 @@ impl error::ResponseError<> for ApiError {
             ApiError::UserNotFoundError => {
                 HttpResponse::NotFound().body("invalid username: user not found")
             },
-
+            ApiError::FitbitTwoVerificationCodeNotFound => {
+                HttpResponse::NotFound().finish()
+            }
         }
     }
 }

@@ -20,5 +20,22 @@ cargo run --release
 ```
 ssh -i "AcpResearch.pem" ubuntu@ec2-18-207-248-247.compute-1.amazonaws.com
 ```
+
 ## Install Docker
-- https://docs.docker.com/engine/install/ubuntu/
+- https://docs.docker.com/engine/install
+
+## Running DB for Local Development
+```
+cd {project_dir}
+cp default.env .env
+docker compose -f docker-compose-dev.yml up -d
+```
+
+## Installing Diesel for Local Development
+- https://diesel.rs/guides/getting-started
+
+## Fitbit Sense 2 App manager
+- https://dev.fitbit.com/
+
+## All Day Data Collection Fitbit
+- https://www.fitabase.com/resources/knowledge-base/getting-started/syncing-fitbit-devices/

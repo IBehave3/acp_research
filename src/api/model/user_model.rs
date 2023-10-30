@@ -102,6 +102,17 @@ pub struct UserKeychain {
     pub devicemacs: Option<Vec<Option<String>>>,
 }
 
+#[derive(
+    Queryable, Selectable, Identifiable, Associations, Serialize, Deserialize, Debug, PartialEq,
+)]
+#[diesel(belongs_to(User, foreign_key = userid))]
+#[diesel(table_name = crate::schema::user_fitbit_two)]
+pub struct UserFitbitTwo {
+    pub id: i32,
+    pub userid: i32,
+    pub verificationcode: String,
+}
+
 // NOTE: client types -------------------------------
 #[derive(Serialize, Deserialize)]
 pub struct ClientLoginUser {
@@ -291,6 +302,15 @@ pub struct CreateUserKeyChain {
     pub devicemacs: Vec<String>,
 }
 
+#[derive(Insertable, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_fitbit_two)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct CreateUserFitbitTwo {
+    pub userid: i32,
+    pub verificationcode: String,
+}
+
+
 // NOTE: update types -------------------------------
 #[derive(AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::user_airthings)]
@@ -334,4 +354,10 @@ pub struct UpdateUserKeychain {
     pub devicemacs: Vec<String>,
 }
 
+#[derive(AsChangeset, Serialize, Deserialize)]
+#[diesel(table_name = crate::schema::user_fitbit_two)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct UpdateUserFitbitTwo {
+    pub verificationcode: String,
+}
 

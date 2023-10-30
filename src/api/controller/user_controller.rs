@@ -18,7 +18,7 @@ use crate::api::model::user_model::{
     ClientCreateUser, ClientGetUserInformation, ClientLoginUser, ClientUpdateUserAirthings,
     ClientUpdateUserGrayWolf, ClientUpdateUserUhooBusiness, CreateUser, CreateUserAirthings,
     CreateUserGrayWolf, CreateUserUhooBusiness, UpdateUserAirthings, UpdateUserGrayWolf,
-    UpdateUserUhooBusiness, User, UserAirthings, UserGrayWolf, UserUhooBusiness, UserUhooHome, UpdateUserUhooHome, CreateUserUhooHome, ClientUpdateUserUhooHome, UserKeychain, ClientUpdateUserKeychain, UpdateUserKeychain,
+    UpdateUserUhooBusiness, User, UserAirthings, UserGrayWolf, UserUhooBusiness, UserUhooHome, UpdateUserUhooHome, CreateUserUhooHome, ClientUpdateUserUhooHome, UserKeychain, ClientUpdateUserKeychain, UpdateUserKeychain, CreateUserFitbitTwo, UpdateUserFitbitTwo,
 };
 use crate::schema::user_airthings::dsl::user_airthings;
 use crate::schema::user_airthings::{self as user_airthings_fields};
@@ -26,6 +26,8 @@ use crate::schema::user_gray_wolfs::dsl::user_gray_wolfs;
 use crate::schema::user_gray_wolfs::{self as user_gray_wolfs_fields};
 use crate::schema::user_uhoo_business::dsl::user_uhoo_business;
 use crate::schema::user_uhoo_business::{self as user_uhoo_business_fields};
+use crate::schema::user_fitbit_two::dsl::user_fitbit_two;
+use crate::schema::user_fitbit_two::{self as user_fitbit_two_fields};
 use crate::schema::user_uhoo_homes::dsl::user_uhoo_homes;
 use crate::schema::user_uhoo_homes::{self as user_uhoo_homes_fields};
 use crate::schema::user_keychains::dsl::user_keychains;
@@ -136,7 +138,7 @@ pub async fn create_user(
         .get_result(database_connection)
         .await
     {
-        Ok(blog_id) => blog_id,
+        Ok(user_id) => user_id,
         Err(err) => {
             error!("{err}");
 
@@ -164,7 +166,7 @@ pub async fn login_user(
         .first(database_connection)
         .await
     {
-        Ok(blog_result) => blog_result,
+        Ok(user_result) => user_result,
         Err(err) => {
             error!("{err}");
 
@@ -231,7 +233,7 @@ pub async fn update_user_airthings(
         .execute(database_connection)
         .await
     {
-        Ok(blog_id) => blog_id,
+        Ok(user_id) => user_id,
         Err(err) => {
             error!("{err}");
 
@@ -313,7 +315,7 @@ pub async fn update_user_uhoo_business(
         .execute(database_connection)
         .await
     {
-        Ok(blog_id) => blog_id,
+        Ok(user_id) => user_id,
         Err(err) => {
             error!("{err}");
 
@@ -354,7 +356,7 @@ pub async fn update_user_uhoo_home(
         .execute(database_connection)
         .await
     {
-        Ok(blog_id) => blog_id,
+        Ok(user_id) => user_id,
         Err(err) => {
             error!("{err}");
 
@@ -395,12 +397,46 @@ pub async fn update_user_keychain(
         .execute(database_connection)
         .await
     {
-        Ok(blog_id) => blog_id,
+        Ok(user_id) => user_id,
         Err(err) => {
             error!("{err}");
 
             return Err(api_error::ApiError::DbError {
                 message: "update_user_keychain failed".to_string(),
+            }
+            .into());
+        }
+    };
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+pub async fn update_user_fitbit_two(
+    pool: Arc<DbPool>,
+    authenticated_claims: AuthenticatedClaims,
+    verify: String,
+) -> actix_web::Result<impl Responder> {
+    let database_connection = &mut pool.get().await.map_err(|_| ApiError::DbPoolError)?;
+
+    match diesel::insert_into(user_fitbit_two)
+        .values(CreateUserFitbitTwo {
+            userid: authenticated_claims.user_id,
+            verificationcode: verify.to_owned(),
+        })
+        .on_conflict(user_fitbit_two_fields::userid)
+        .do_update()
+        .set(UpdateUserFitbitTwo {
+            verificationcode: verify.to_owned(),
+        })
+        .execute(database_connection)
+        .await
+    {
+        Ok(user_id) => user_id,
+        Err(err) => {
+            error!("{err}");
+
+            return Err(api_error::ApiError::DbError {
+                message: "update_user_fitbit_two failed".to_string(),
             }
             .into());
         }

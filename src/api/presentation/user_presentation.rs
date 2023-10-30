@@ -1,7 +1,7 @@
 use crate::{
     api::controller::user_controller,
-    api::infra::jwt_middleware::AuthenticatedClaims,
-    api::infra::database::DbPool,
+    api::{infra::jwt_middleware::AuthenticatedClaims},
+    api::{infra::database::DbPool, model::fitbit_two_model::FitbitTwoQueryParameters},
     api::model::user_model::{
             ClientCreateUser, ClientLoginUser, ClientUpdateUserAirthings, ClientUpdateUserGrayWolf,
             ClientUpdateUserUhooBusiness, ClientUpdateUserUhooHome, ClientUpdateUserKeychain,
@@ -12,6 +12,7 @@ use actix_web::{
     web::{self, Data, Json},
     Responder, Result,
 };
+
 
 #[post("/create-user")]
 pub async fn create_user_post_handler(
@@ -107,4 +108,16 @@ pub async fn keychain_user_patch_handler(
     .await
 }
 
-
+#[patch("/fitbit-two-user")]
+pub async fn fitbit_two_user_patch_handler(
+    pool: Data<DbPool>,
+    authenticated_claims: web::ReqData<AuthenticatedClaims>,
+    fitbit_two_query_parameters: web::Query<FitbitTwoQueryParameters>
+) -> Result<impl Responder> {
+    user_controller::update_user_fitbit_two(
+        pool.into_inner(),
+        authenticated_claims.into_inner(),
+        fitbit_two_query_parameters.into_inner().verify,
+    )
+    .await
+}

@@ -1,7 +1,5 @@
 use core::panic;
 
-
-
 use actix_web::middleware::Logger;
 use actix_web::{web, web::Data, App, HttpServer};
 
@@ -9,7 +7,7 @@ use diesel_async::pooled_connection::deadpool::Pool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::AsyncPgConnection;
 use env_logger::Env;
-use log::{info, error};
+use log::{error, info};
 
 use api::startup::on_api_startup;
 use api::startup::API_CONFIG;
@@ -19,17 +17,17 @@ use share::model::DATABASE_CONFIG;
 use tokio::task;
 use tokio::time::{sleep, Duration};
 
+use crate::api::infra::jwt_middleware;
+use crate::api::model::jwt_model::JwtToken;
 use crate::polling::poller::airthings_poller::airthings_poll;
 use crate::polling::poller::gray_wolf_poller::gray_wolf_poll;
 use crate::polling::poller::keychain_poller::keychain_poll;
 use crate::polling::poller::uhoo_business_poller::uhoo_business_poll;
 use crate::polling::poller::uhoo_home_poller::uhoo_home_poll;
-use crate::api::infra::jwt_middleware;
-use crate::api::model::jwt_model::JwtToken;
 
 mod api;
-mod schema;
 mod polling;
+mod schema;
 mod share;
 
 const POLL_INTERVAL_IN_SECONDS: u64 = 120;
@@ -50,7 +48,7 @@ pub async fn start_polling() -> std::io::Result<()> {
     info!("\n{:#?}", database_config);
 
     loop {
-        if let Err(err) =  tokio::try_join!(
+        if let Err(err) = tokio::try_join!(
             task::spawn(keychain_poll()),
             task::spawn(airthings_poll()),
             task::spawn(uhoo_business_poll()),
@@ -106,6 +104,9 @@ pub async fn start_server() -> std::io::Result<()> {
                 web::scope("/api")
                     .service(api::presentation::test_presentation::test_get_handler)
                     .service(
+                        web::scope("/fitbit-two")
+                                .service(api::presentation::fitbit_two_presentation::get_fitbit_two_get_handler))
+                    .service(
                         web::scope("/auth-init")
                             .service(api::presentation::user_presentation::create_user_post_handler)
                             .service(api::presentation::user_presentation::login_user_get_handler),
@@ -119,6 +120,7 @@ pub async fn start_server() -> std::io::Result<()> {
                             .service(api::presentation::user_presentation::uhoo_business_user_patch_handler)
                             .service(api::presentation::user_presentation::uhoo_home_user_patch_handler)
                             .service(api::presentation::user_presentation::keychain_user_patch_handler)
+                            .service(api::presentation::user_presentation::fitbit_two_user_patch_handler)
                     )
                     .service(
                         web::scope("/fitbit")

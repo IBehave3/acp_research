@@ -262,6 +262,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_fitbit_two (id) {
+        id -> Int4,
+        userid -> Int4,
+        verificationcode -> Varchar,
+    }
+}
+
+diesel::table! {
     user_gray_wolfs (id) {
         id -> Int4,
         userid -> Int4,
@@ -368,6 +376,7 @@ diesel::joinable!(keychains -> users (userid));
 diesel::joinable!(uhoo_business -> users (userid));
 diesel::joinable!(uhoo_homes -> users (userid));
 diesel::joinable!(user_airthings -> users (userid));
+diesel::joinable!(user_fitbit_two -> users (userid));
 diesel::joinable!(user_gray_wolfs -> users (userid));
 diesel::joinable!(user_keychains -> users (userid));
 diesel::joinable!(user_locations -> users (userid));
@@ -391,6 +400,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     uhoo_business,
     uhoo_homes,
     user_airthings,
+    user_fitbit_two,
     user_gray_wolfs,
     user_keychains,
     user_locations,

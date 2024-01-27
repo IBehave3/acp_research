@@ -39,3 +39,25 @@ docker compose -f docker-compose-dev.yml up -d
 
 ## All Day Data Collection Fitbit
 - https://www.fitabase.com/resources/knowledge-base/getting-started/syncing-fitbit-devices/
+
+## Running on Bim lab 
+# credentials for dev environment
+1. username: bim
+2. password: password
+
+# start docker
+1. check docker status: `sudo systemctl status docker`
+2. (if needed) start docker: sudo systemctl start docker
+
+# start backend
+`sudo docker-compose -f docker-compose-prod.yml up`
+
+# stop backend
+`sudo docker-compose -f docker-compose-prod.yml down`
+
+# check docker containers
+`sudo docker ps`
+
+# pgAdmin connection string
+`postgres://internal_user:password@localhost:27017/acp_research_db`
+
